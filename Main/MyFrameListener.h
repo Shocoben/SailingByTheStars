@@ -1,3 +1,4 @@
+#pragma once
 #include "Ogre.h"
 #include "OIS.h"
 
@@ -12,7 +13,7 @@ protected :
 
 
 public :
-	MyFrameListener(Ogre::RenderWindow* win);
+	MyFrameListener(Ogre::RenderWindow* win, Ogre::Root* root);
 	void setMouseViewportSize(Ogre::Viewport* viewPort);
 	~MyFrameListener();
 

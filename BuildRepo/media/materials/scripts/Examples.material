@@ -88,8 +88,7 @@ material Examples/SpaceSkyBox
 	}
 }
 
-
-material Examples/nightSkyBox
+material Examples/NightSkyDome
 {
 	technique
 	{
@@ -100,8 +99,7 @@ material Examples/nightSkyBox
 
 			texture_unit
 			{
-				cubic_texture lostatseanight_front.jpg lostatseanight_back.jpg lostatseanight_left.jpg lostatseanight_right.jpg lostatseanight_top.jpg lostatseanight_top.jpg separateUV
-				tex_address_mode clamp
+				texture starfield.jpg
 			}
 		}
 	}
@@ -390,23 +388,6 @@ material Examples/CloudySky
 			{
 				texture clouds.jpg
 				scroll_anim 0.15 0
-			}
-		}
-	}
-}
-
-material Examples/NightSkyDome
-{
-	technique
-	{
-		pass
-		{
-			lighting off
-			depth_write off
-
-			texture_unit
-			{
-				texture starfield.jpg
 			}
 		}
 	}

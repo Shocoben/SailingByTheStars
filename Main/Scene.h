@@ -2,20 +2,13 @@
 #include "MyFrameListener.h"
 class Scene;
 
-class GameObject
-{
-public :
-	unsigned int getSceneID();
-	void objectHaveBeenErasedFromlist(const unsigned int objSceneID);
-	GameObject(Scene* scene, Ogre::Node* node);
-	const std::string* getName();
-	void setName(std::string* name);
-};
+class GameObject;
 
 class Scene : public MyFrameListener
 {
 public :
-	Scene(Ogre::RenderWindow* win, Ogre::Root* _root);
+	Scene(Ogre::RenderWindow* win, Ogre::Root* root);
+	~Scene();
 	virtual void createCameras(Ogre::RenderWindow* win);
 	virtual void createScene();
 	virtual bool frameStarted(const Ogre::FrameEvent& evt); 

@@ -1,4 +1,18 @@
 #include "MyApplication.h"
+#include "Scene.h"
+
+bool MyApplication::_keepRunning = true;
+
+bool MyApplication::keepRunning()
+{
+	return _keepRunning;
+}
+
+void MyApplication::exit()
+{
+	_keepRunning = false;
+}
+
 
 MyApplication::MyApplication()
 {

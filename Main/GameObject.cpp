@@ -1,6 +1,8 @@
 #include "GameObject.h"
+#include "Scene.h"
+#include "Collider.h"
 
-GameObject::GameObject(Scene* scene, Ogre::Node* node) : _myScene(scene), _node(node), _collider(new Collider(this)), _sceneID(_myScene->getLastGOListLength())
+GameObject::GameObject(Scene* scene, Ogre::Node* node) : _myScene(scene), _node(node), _collider(new PointCollider(new Vector3(0,0,0), _node ), _sceneID(_myScene->getLastGOListLength())
 {
 	std::ostringstream tempStream;
 	tempStream << "GameObject" << _sceneID;
@@ -25,6 +27,7 @@ const Ogre::Node* GameObject::getNode() const
 
 void GameObject::setCollider(Collider* collider)
 {
+	delete _collider;
 	_collider = collider;
 }
 
@@ -54,9 +57,13 @@ const std::string* GameObject::getName()
 	return &_name;
 }
 
+
+
 GameObject::~GameObject(void)
 {
-	
+	if (_myScene != NULL)
+		_myScene->removeFromScene(this);
+	delete _collider;
 }
 
 

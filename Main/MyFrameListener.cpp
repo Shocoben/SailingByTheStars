@@ -1,6 +1,6 @@
 #include "MyFrameListener.h"
 
-MyFrameListener::MyFrameListener(Ogre::RenderWindow* win)
+MyFrameListener::MyFrameListener(Ogre::RenderWindow* win, Ogre::Root* root)
 {
 	size_t wHnd;
 	win->getCustomAttribute("WINDOW", &wHnd);

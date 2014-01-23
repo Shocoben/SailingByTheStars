@@ -5,7 +5,7 @@ int main()
 	MyApplication app;
 	
 	app.go();
-	while( app.keepRunning() )
+	while( MyApplication::keepRunning() )
 	{
 		app.update( );
 	}

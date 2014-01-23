@@ -1,13 +1,21 @@
 #include "Scene.h"
 #include "MathP.h"
+#include "MyApplication.h"
+#include "GameObject.h"
+#include "Collider.h"
 
-Scene::Scene(Ogre::RenderWindow* win, Ogre::Root* _root) : MyFrameListener(win), _movementSpeed(50.0f)
+Scene::Scene(Ogre::RenderWindow* win, Ogre::Root* root) : MyFrameListener(win, root), _movementSpeed(50.0f)
 {
-	_sceneManager = _root->createSceneManager(Ogre::ST_GENERIC);
+	_sceneManager = root->createSceneManager(Ogre::ST_GENERIC);
 	
 	createCameras(win);
 	createScene();
 	
+}
+
+Scene::~Scene()
+{
+
 }
 
 void Scene::createCameras(Ogre::RenderWindow* win)
@@ -24,7 +32,7 @@ void Scene::createCameras(Ogre::RenderWindow* win)
 	setMouseViewportSize(_viewport);
 }
 
-
+GameObject* nGO;
 void Scene::createScene()
 {
 	Ogre::ColourValue fadeColour(0.03f, 0.03f, 0.08f);
@@ -55,12 +63,14 @@ void Scene::createScene()
 	_groundNode->attachObject(groundEnt);
 	groundEnt->setMaterialName("OceanFloor");
 
-	GameObject* nGO = new GameObject(this, _sceneManager->getRootSceneNode()->createChildSceneNode());
+	
+	nGO = new GameObject(this, _sceneManager->getRootSceneNode()->createChildSceneNode());
 	GameObject* nGODos = new GameObject(this, _sceneManager->getRootSceneNode()->createChildSceneNode());
 	GameObject* nGOTres = new GameObject(this, _sceneManager->getRootSceneNode()->createChildSceneNode());
 
-	removeFromScene(nGO);
+	//removeFromScene(nGO);
 	removeFromScene(nGOTres);
+	
 }
 
 bool Scene::frameStarted(const Ogre::FrameEvent& evt)
@@ -89,6 +99,12 @@ bool Scene::frameStarted(const Ogre::FrameEvent& evt)
 			camTranslate += Ogre::Vector3(1, 0, 0);
 		}
 
+		if (_keyboard->isKeyDown(OIS::KC_F4) )
+		{
+			MyApplication::exit();
+			return false;
+		}
+
 		_camera->moveRelative(camTranslate * evt.timeSinceLastFrame * _movementSpeed);
 
 
@@ -109,13 +125,17 @@ bool Scene::frameStarted(const Ogre::FrameEvent& evt)
 		
 		std::pair<bool, Real> intersectR = MathP::rayIntersectSphere(mouseRay, *_skySphere);
 		
+		/*
 		if (intersectR.first)
 		{
 			Vector3 intersect = mouseRay.getOrigin() + mouseRay.getDirection() * intersectR.second;
 			std::cout << " x " << intersect.x << " y " << intersect.y << " z " << intersect.z << std::endl;			
-		}
+		}*/
+
+		
 	}
 	
+
 	return true;
 }
 
@@ -130,6 +150,8 @@ void Scene::addToScene(GameObject* gameObject)
 }
 
 
+
+
 void Scene::removeFromScene(GameObject* gameObject)
 {
 	std::vector<GameObject*>::iterator itGO = _gameObjectsList.begin() + gameObject->getSceneID();
@@ -141,7 +163,6 @@ void Scene::removeFromScene(GameObject* gameObject)
 			cObj->objectHaveBeenErasedFromlist(gameObject->getSceneID());
 		}
 	}
-
 	_gameObjectsList.erase(itGO);
 
 

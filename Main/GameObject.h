@@ -1,20 +1,8 @@
 #pragma once
 #include "Ogre.h"
 //#include "Collider.h"
-class GameObject;
-class Collider
-{
-	public :
-		Collider(const GameObject* gameObject);
-};
-
-class Scene
-{
-public :
-	void addToScene(GameObject* object);
-	void removeFromScene( GameObject* object);
-	int getLastGOListLength();
-};
+class Collider;;
+class Scene;
 
 
 class GameObject

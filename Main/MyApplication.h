@@ -1,4 +1,6 @@
-#include "Scene.h"
+#pragma once
+#include "Ogre.h"
+class MyFrameListener;
 
 class MyApplication
 {
@@ -11,7 +13,7 @@ class MyApplication
 		std::string _appName;
 		std::string _defaultRessourcesPath;
 
-		bool _keepRunning;
+		static bool _keepRunning;
 	public :
 		MyApplication();
 		~MyApplication();
@@ -23,10 +25,9 @@ class MyApplication
 		int go();
 
 		void update();
-		bool keepRunning()
-		{
-			return _keepRunning;
-		}
+		static bool keepRunning();
+
+		static void exit();
 
 		void setAppName(std::string appName)
 		{

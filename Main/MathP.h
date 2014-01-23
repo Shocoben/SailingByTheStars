@@ -1,6 +1,5 @@
-#include "Ogre.h"
 #pragma once
-
+#include "Ogre.h"
 
 class MathP
 {
