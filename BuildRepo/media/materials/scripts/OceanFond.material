@@ -1,0 +1,13 @@
+material OceanFloor
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture oceanfloor.jpg
+			}
+		}
+	}
+}

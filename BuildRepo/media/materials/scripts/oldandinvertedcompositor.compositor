@@ -1,0 +1,33 @@
+compositor Oldandinverted
+{
+	technique
+	{
+		texture scene target_width target_height PF_R8G8B8
+	
+
+
+		target scene
+		{
+			input previous
+		}
+
+		target scene
+		{
+			pass render_quad
+			{
+				material BeginnerGuide/BlackAndWhiteProcess
+				input 0 scene
+			}
+		}
+
+		target_output
+		{
+			input none
+			pass render_quad
+			{
+				material BeginnerGuide/Invert
+				input 0 scene
+			}
+		}
+	}
+}

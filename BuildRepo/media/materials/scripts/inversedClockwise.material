@@ -1,0 +1,14 @@
+material SphereSky
+{
+	technique
+	{
+		pass
+		{
+			cull_hardware anticlockwise
+			texture_unit
+			{
+				texture starfield.jpg
+			}
+		}
+	}
+}

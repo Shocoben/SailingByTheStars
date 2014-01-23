@@ -1,0 +1,14 @@
+material SphereSky
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			texture_unit
+			{
+				texture test.jpg
+			}
+		}
+	}
+}

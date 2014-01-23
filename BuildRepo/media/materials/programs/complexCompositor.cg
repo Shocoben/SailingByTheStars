@@ -1,0 +1,8 @@
+void complexCompositionFrag(float2 uv : TEXCOORD0, out float4 color : COLOR, uniform sampler2D texture, uniform float numpixels)
+{
+	float stepsize = 1.0 / numpixels;
+	
+	float2 fragment = float2(stepsize * floor(uv.x * numpixels), stepsize * floor(uv.y * numpixels));
+
+	color = tex2D(texture, fragment);
+}
