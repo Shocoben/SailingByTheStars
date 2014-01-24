@@ -22,7 +22,7 @@ void Scene::createCameras(Ogre::RenderWindow* win)
 {
 	_camera = _sceneManager->createCamera( "MainCamera" );
 	_camera->setPosition(Ogre::Vector3(0,20,0));
-	_camera->lookAt(0,15,30);
+	_camera->lookAt(0,15,-30);
 	_camera->setNearClipDistance(5);
 			
 	_viewport= win->addViewport(_camera);
@@ -64,13 +64,19 @@ void Scene::createScene()
 	groundEnt->setMaterialName("OceanFloor");
 
 	
-	nGO = new GameObject(this, _sceneManager->getRootSceneNode()->createChildSceneNode());
-	GameObject* nGODos = new GameObject(this, _sceneManager->getRootSceneNode()->createChildSceneNode());
-	GameObject* nGOTres = new GameObject(this, _sceneManager->getRootSceneNode()->createChildSceneNode());
-
-	//removeFromScene(nGO);
-	removeFromScene(nGOTres);
+	Ogre::Entity* ent = _sceneManager->createEntity("sinbad","Sinbad.mesh");
 	
+	nGO = new GameObject(this, "test");
+	nGO->getNode()->attachObject(ent);
+	nGO->getNode()->setPosition(0, 20, -6);
+	nGO->getNode()->setScale(1,1,1);
+
+	
+}
+
+Ogre::SceneManager* Scene::sceneManager()
+{
+	return _sceneManager;
 }
 
 bool Scene::frameStarted(const Ogre::FrameEvent& evt)
@@ -124,13 +130,6 @@ bool Scene::frameStarted(const Ogre::FrameEvent& evt)
 		
 		
 		std::pair<bool, Real> intersectR = MathP::rayIntersectSphere(mouseRay, *_skySphere);
-		
-		/*
-		if (intersectR.first)
-		{
-			Vector3 intersect = mouseRay.getOrigin() + mouseRay.getDirection() * intersectR.second;
-			std::cout << " x " << intersect.x << " y " << intersect.y << " z " << intersect.z << std::endl;			
-		}*/
 
 		
 	}

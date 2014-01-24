@@ -134,17 +134,17 @@ bool PointCollider::collideWith(BaseCollider* base)
 }
 
 //SphereCollider
-SphereCollider::SphereCollider(ColliderTransform* transform) : BaseCollider(transform, ColliderType::sphere)
+SphereCollider::SphereCollider(ColliderTransform* transform, const float radius) : BaseCollider(transform, ColliderType::sphere), _radius(radius)
 {
 
 }
 
-SphereCollider::SphereCollider(const Ogre::Vector3& position) : BaseCollider(position, ColliderType::sphere)
+SphereCollider::SphereCollider(const Ogre::Vector3& position, const float radius) : BaseCollider(position, ColliderType::sphere), _radius(radius)
 {
 
 }
 
-SphereCollider::SphereCollider(const Ogre::Vector3& position, const Ogre::Node* node) : BaseCollider(position, node, ColliderType::sphere)
+SphereCollider::SphereCollider(const Ogre::Vector3& position, const Ogre::Node* node, const float radius) : BaseCollider(position, node, ColliderType::sphere), _radius(radius)
 {
 
 }
@@ -343,4 +343,9 @@ bool BaseCollider::collision(const BoxColliderAABB& boxA, const BoxColliderAABB&
 		return FALSE;
 	}
 	return TRUE;
+}
+
+bool BaseCollider::collision(const SphereCollider& sphere, const BoxColliderAABB& box)
+{
+	return FALSE;
 }

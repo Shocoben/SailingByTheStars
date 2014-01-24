@@ -2,30 +2,22 @@
 #include "Scene.h"
 #include "Collider.h"
 
-GameObject::GameObject(Scene* scene, Ogre::Node* node) : _myScene(scene), _node(node), _collider(new PointCollider(new Vector3(0,0,0), _node ), _sceneID(_myScene->getLastGOListLength())
-{
-	std::ostringstream tempStream;
-	tempStream << "GameObject" << _sceneID;
-	_name = tempStream.str();
-	_myScene->addToScene(this);
-}
-
-GameObject::GameObject(Scene* scene, Ogre::Node* node, const char* name) : _myScene(scene), _node(node), _collider(new Collider(this)), _sceneID(_myScene->getLastGOListLength()), _name(name)
+GameObject::GameObject(Scene* myScene) : _node(myScene->sceneManager()->getRootSceneNode()->createChildSceneNode() ), _myScene(myScene), _collider( new SphereCollider( Vector3( 0,0,0 ), _node, 3 ) )
 {
 	_myScene->addToScene(this);
 }
 
-const Ogre::Node* GameObject::getNode()
+GameObject::GameObject(Scene* myScene, const String &name) : _node(myScene->sceneManager()->getRootSceneNode()->createChildSceneNode(name) ), _myScene(myScene), _collider( new SphereCollider( Vector3( 0,0,0 ), _node, 3 ) )
+{
+	_myScene->addToScene(this);
+}
+
+SceneNode* GameObject::getNode()
 {
 	return _node;
 }
 
-const Ogre::Node* GameObject::getNode() const
-{
-	return _node;
-}
-
-void GameObject::setCollider(Collider* collider)
+void GameObject::setCollider(BaseCollider* collider)
 {
 	delete _collider;
 	_collider = collider;
@@ -36,7 +28,7 @@ unsigned int GameObject::getSceneID()
 	return _sceneID;
 }
 
-const Collider* GameObject::getCollider()
+const BaseCollider* GameObject::getCollider()
 {
 	return _collider;
 }
@@ -46,17 +38,6 @@ void GameObject::objectHaveBeenErasedFromlist(const unsigned int objSceneID)
 	if (objSceneID < _sceneID)
 		--_sceneID;
 }
-
-void GameObject::setName(std::string& name)
-{
-	_name = name;
-}
-
-const std::string* GameObject::getName()
-{
-	return &_name;
-}
-
 
 
 GameObject::~GameObject(void)

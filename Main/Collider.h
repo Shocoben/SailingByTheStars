@@ -38,7 +38,6 @@ public :
 protected :
 	ColliderTransform* _transform;
 	ColliderType _type;
-	virtual void initType();
 public :
 	const ColliderType& getColliderType();
 	const ColliderType& getColliderType() const;
@@ -93,9 +92,9 @@ class SphereCollider : public BaseCollider //There is a problem: I can't become 
 private :
 	float _radius;
 public : 
-	SphereCollider(ColliderTransform* transform);
-	SphereCollider(const Ogre::Vector3& position);
-	SphereCollider(const Ogre::Vector3& position, const Ogre::Node* node);
+	SphereCollider(ColliderTransform* transform, const float radius);
+	SphereCollider(const Ogre::Vector3& position, const float radius);
+	SphereCollider(const Ogre::Vector3& position, const Ogre::Node* node, const float radius);
 
 	virtual bool collideWith(const BoxColliderAABB& box);
 	virtual bool collideWith(const Ogre::Vector3& point);

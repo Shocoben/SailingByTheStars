@@ -1,31 +1,33 @@
 #pragma once
 #include "Ogre.h"
 //#include "Collider.h"
-class Collider;;
+class BaseCollider;
 class Scene;
 
-
+using namespace Ogre;
 class GameObject
 {
-private :
+protected :
 	Scene* _myScene;
-	Ogre::Node* _node;
-	Collider* _collider;
+	BaseCollider* _collider;
 	unsigned int _sceneID;
-	std::string _name;
+
+	SceneNode* _node;
+	
+
 public :
-	GameObject(Scene* scene, Ogre::Node* node);
-	GameObject(Scene* scene, Ogre::Node* node, const char* name);
-	const Collider* getCollider();
-	void setCollider(Collider* collider);
+	GameObject(Scene* myScene);
+	GameObject(Scene* myScene, const String &name);
+
+	const BaseCollider* getCollider();
+	void setCollider(BaseCollider* collider);
+
 	void objectHaveBeenErasedFromlist(const unsigned int objSceneID);
 	unsigned int getSceneID();
-	
-	const Ogre::Node* getNode();
-	const Ogre::Node* getNode() const;
 
-	const std::string* getName();
-	void setName(std::string& name);
+	SceneNode* getNode();
+
+
 	~GameObject(void);
 };
 

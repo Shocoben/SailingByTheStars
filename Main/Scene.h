@@ -15,6 +15,8 @@ public :
 	void addToScene(GameObject* object);
 	void removeFromScene( GameObject* object);
 	int getLastGOListLength();
+	Ogre::SceneManager* sceneManager();
+
 protected :
 	Plane* _waterPlane;
 	Camera* _camera;
