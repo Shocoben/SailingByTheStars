@@ -30,6 +30,8 @@ ColliderTransformNode::ColliderTransformNode(const Ogre::Vector3& position, cons
 
 const Ogre::Vector3& ColliderTransformNode::getAbsolutePosition() const
 {
+
+
 	return _node->_getDerivedPosition() + _position;
 }
 
@@ -59,8 +61,6 @@ BaseCollider::BaseCollider(const Ogre::Vector3& position, const Ogre::Node* node
 {
 
 }
-
-
 
 const BaseCollider::ColliderType& BaseCollider::getColliderType()
 {
@@ -118,10 +118,17 @@ bool PointCollider::collideWith(const PointCollider& Vector3)
 	return false;
 }
 
+bool PointCollider::collideWith(const BaseCollider* base)
+{
+	BaseCollider* nBase = const_cast<BaseCollider*>(base);
+	return collideWith(nBase);
+}
+
 bool PointCollider::collideWith(BaseCollider* base)
 {
 	if (base->getColliderType() == ColliderType::sphere)
 	{
+		std::cout<<"sphere" << std::endl;
 		SphereCollider* nCollider = dynamic_cast<SphereCollider*>(base); 
 		return collision(*nCollider, _transform->getAbsolutePosition());
 	}

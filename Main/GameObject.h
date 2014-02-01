@@ -7,15 +7,8 @@ class Scene;
 using namespace Ogre;
 class GameObject
 {
-protected :
-	Scene* _myScene;
-	BaseCollider* _collider;
-	unsigned int _sceneID;
-
-	SceneNode* _node;
-	
-
 public :
+	GameObject();
 	GameObject(Scene* myScene);
 	GameObject(Scene* myScene, const String &name);
 
@@ -29,6 +22,11 @@ public :
 
 
 	~GameObject(void);
+protected :
+	Scene* _myScene;
+	unsigned int _sceneID;
+	SceneNode* _node;
+	BaseCollider* _collider;
 };
 
 

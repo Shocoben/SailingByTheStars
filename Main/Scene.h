@@ -1,7 +1,6 @@
 #pragma once
 #include "MyFrameListener.h"
 class Scene;
-
 class GameObject;
 
 class Scene : public MyFrameListener
@@ -22,12 +21,9 @@ protected :
 	Camera* _camera;
 	Viewport* _viewport;
 	
-	Ogre::SceneNode* _entNode;
-	Ogre::SceneNode* _camNode;
 	Ogre::SceneManager* _sceneManager;
-	Ogre::Sphere* _skySphere;
+
 	std::vector<GameObject*> _gameObjectsList;
-	
-	float _movementSpeed;
+
 };
 

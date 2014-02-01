@@ -85,6 +85,7 @@
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MainScene.cpp" />
     <ClCompile Include="MathP.cpp" />
     <ClCompile Include="MyApplication.cpp" />
     <ClCompile Include="MyFrameListener.cpp" />
@@ -93,6 +94,7 @@
   <ItemGroup>
     <ClInclude Include="Collider.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="MainScene.h" />
     <ClInclude Include="MathP.h" />
     <ClInclude Include="MyApplication.h" />
     <ClInclude Include="MyFrameListener.h" />

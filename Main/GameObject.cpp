@@ -2,6 +2,11 @@
 #include "Scene.h"
 #include "Collider.h"
 
+GameObject::GameObject()
+{
+
+}
+
 GameObject::GameObject(Scene* myScene) : _node(myScene->sceneManager()->getRootSceneNode()->createChildSceneNode() ), _myScene(myScene), _collider( new SphereCollider( Vector3( 0,0,0 ), _node, 3 ) )
 {
 	_myScene->addToScene(this);

@@ -24,10 +24,10 @@ std::pair<bool, Ogre::Real> MathP::rayIntersectSphere(Ogre::Ray& ray, const Ogre
 {
 		Ogre::Vector3 c = s.getCenter();
 		bool OriginInsideTheSpere = (ray.getOrigin().distance( c ) < s.getRadius() )? true : false;
-		
 
 		if (OriginInsideTheSpere)
 		{
+			
 			Vector3 L = ray.getOrigin() - c;
 			Ogre::Real a = ray.getDirection().dotProduct(ray.getDirection());
 			Ogre::Real b = 2 * ray.getDirection().dotProduct(L);

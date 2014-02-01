@@ -34,11 +34,6 @@ class BaseCollider
 {
 public : 
 	enum ColliderType{none, point, sphere, boxAABB };
-
-protected :
-	ColliderTransform* _transform;
-	ColliderType _type;
-public :
 	const ColliderType& getColliderType();
 	const ColliderType& getColliderType() const;
 
@@ -66,7 +61,9 @@ public :
 	static bool collision(const SphereCollider& sphere, const SphereCollider& sphereBis);
 	static bool collision(const BoxColliderAABB& box, const BoxColliderAABB& boxBis);
 	static bool collision(const SphereCollider& sphere, const BoxColliderAABB& box);
-
+protected :
+	ColliderTransform* _transform;
+	ColliderType _type;
 };
 
 
@@ -84,6 +81,7 @@ public :
 	virtual bool collideWith(const PointCollider& point);
 
 	bool collideWith( BaseCollider* base);
+	bool collideWith( const BaseCollider* base);
 };
 
 
