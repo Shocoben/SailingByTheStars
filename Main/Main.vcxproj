@@ -88,7 +88,7 @@
     <ClCompile Include="MainScene.cpp" />
     <ClCompile Include="MathP.cpp" />
     <ClCompile Include="MyApplication.cpp" />
-    <ClCompile Include="MyFrameListener.cpp" />
+    <ClCompile Include="ApplicationListener.cpp" />
     <ClCompile Include="Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -97,7 +97,7 @@
     <ClInclude Include="MainScene.h" />
     <ClInclude Include="MathP.h" />
     <ClInclude Include="MyApplication.h" />
-    <ClInclude Include="MyFrameListener.h" />
+    <ClInclude Include="ApplicationListener.h" />
     <ClInclude Include="Scene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

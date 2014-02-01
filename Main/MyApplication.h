@@ -1,27 +1,31 @@
 #pragma once
 #include "Ogre.h"
-class MyFrameListener;
+class ApplicationListener;
 
 class MyApplication
 {
 	protected :
 		Ogre::Root* _root;
 		Ogre::RenderWindow* _window;
-		MyFrameListener* _listener;
+		ApplicationListener* _listener;
+		static std::map<std::string, MyApplication*> appsByName;
 
 		std::string _pluginsFilePath;
 		std::string _appName;
 		std::string _defaultRessourcesPath;
 
+
 		static bool _keepRunning;
+
+		
 	public :
-		MyApplication();
+		MyApplication(const std::string& appName);
 		~MyApplication();
 
 		int startUp();
 		bool loadResources(std::string path);
 		void finalizeRessourcesLoading();
-		void createFrameListeners();
+		void finalizeAppListener();
 		int go();
 
 		void update();
@@ -29,10 +33,10 @@ class MyApplication
 
 		static void exit();
 
-		void setAppName(std::string appName)
-		{
-			_appName = appName;
-		}
+		ApplicationListener* getAppListener();
+
+		Ogre::Root* getRoot();
+		Ogre::RenderWindow* getWindow();
 
 		void setPluginsPath(std::string pluginsFilePath)
 		{

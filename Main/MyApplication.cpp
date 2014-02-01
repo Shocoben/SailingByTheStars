@@ -1,8 +1,14 @@
 #include "MyApplication.h"
-#include "Scene.h"
+#include "ApplicationListener.h"
+
+std::map<std::string, MyApplication*> createMap()
+{
+	std::map<std::string, MyApplication*> map;
+	return map;
+}
+std::map<std::string, MyApplication*> MyApplication::appsByName = createMap();
 
 bool MyApplication::_keepRunning = true;
-
 bool MyApplication::keepRunning()
 {
 	return _keepRunning;
@@ -13,15 +19,21 @@ void MyApplication::exit()
 	_keepRunning = false;
 }
 
-
-MyApplication::MyApplication()
+MyApplication::MyApplication(const std::string& appName)
 {
 		_root = NULL;
 		_window = NULL;
 		_listener = NULL;
 		_defaultRessourcesPath = "myResources_d.cfg";
 		_pluginsFilePath = "plugins_d.cfg";
-		_appName = "Ogre3D App";
+		_appName = appName;
+		
+		//appsByName[_appName] = this;
+}
+
+ApplicationListener* MyApplication::getAppListener()
+{
+	return _listener;
 }
 
 MyApplication::~MyApplication()
@@ -36,7 +48,7 @@ int MyApplication::go()
 		return s;
 	loadResources(_defaultRessourcesPath);
 	finalizeRessourcesLoading();
-	createFrameListeners();
+	finalizeAppListener();
 
 	return 0;
 }
@@ -48,7 +60,6 @@ int MyApplication::startUp()
 	{
 		return -1;
 	}
-			
 	_window = _root->initialise(true, _appName);
 	
 	return 0;
@@ -87,10 +98,9 @@ void MyApplication::finalizeRessourcesLoading()
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 }
 
-void MyApplication::createFrameListeners
-()
+void MyApplication::finalizeAppListener()
 {
-	_listener = new Scene(_window, _root);
+	_listener = new ApplicationListener(this);
 	_root->addFrameListener(_listener);
 }
 
@@ -101,3 +111,12 @@ void MyApplication::update()
 
 }
 
+Ogre::Root* MyApplication::getRoot()
+{
+	return _root;
+};
+
+Ogre::RenderWindow* MyApplication::getWindow()
+{
+	return _window;
+}

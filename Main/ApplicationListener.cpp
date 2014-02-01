@@ -1,9 +1,11 @@
-#include "MyFrameListener.h"
+#include "ApplicationListener.h"
+#include "MyApplication.h"
+#include "Scene.h"
 
-MyFrameListener::MyFrameListener(Ogre::RenderWindow* win, Ogre::Root* root)
+ApplicationListener::ApplicationListener(MyApplication* app) : _application(app)
 {
 	size_t wHnd;
-	win->getCustomAttribute("WINDOW", &wHnd);
+	app->getWindow()->getCustomAttribute("WINDOW", &wHnd);
 	std::stringstream wHnDs;
 	wHnDs << wHnd;
 
@@ -23,40 +25,63 @@ MyFrameListener::MyFrameListener(Ogre::RenderWindow* win, Ogre::Root* root)
 	_inputManager = OIS::InputManager::createInputSystem(pl);
 	_keyboard = static_cast<OIS::Keyboard*>(_inputManager->createInputObject( OIS::OISKeyboard, false ));
 	_mouse = static_cast<OIS::Mouse*>(_inputManager->createInputObject(OIS::OISMouse, false));
-
-
 }
 
-void MyFrameListener::setMouseViewportSize(Ogre::Viewport* viewPort)
+int ApplicationListener::getLastSceneID()
+{
+	return _scenes.size();
+}
+
+void ApplicationListener::loadScene(Scene* scene)
+{
+		_currentScene = scene;
+		_currentScene->load();
+}
+
+
+void ApplicationListener::loadScene(int sceneID)
+{
+	loadScene(_scenes[sceneID]);
+}
+
+void ApplicationListener::addScene(Scene* scene)
+{
+	_scenes.push_back(scene);
+}
+
+void ApplicationListener::setMouseViewportSize(Ogre::Viewport* viewPort)
 {
 	_mouse->getMouseState().width = viewPort->getActualWidth();
 	_mouse->getMouseState().height = viewPort->getActualHeight();
 }
 
-MyFrameListener::~MyFrameListener()
+ApplicationListener::~ApplicationListener()
 {
-		_inputManager->destroyInputObject( _keyboard );
-		_inputManager->destroyInputObject( _mouse );
-		OIS::InputManager::destroyInputSystem( _inputManager );
+	_inputManager->destroyInputObject( _keyboard );
+	_inputManager->destroyInputObject( _mouse );
+	OIS::InputManager::destroyInputSystem( _inputManager );
 }
 
-bool MyFrameListener::frameStarted(const Ogre::FrameEvent& evt)
+bool ApplicationListener::frameStarted(const Ogre::FrameEvent& evt)
 {
 		_keyboard->capture( );
 		_mouse->capture( );
 		
 		if ( _keyboard->isKeyDown( OIS::KC_ESCAPE ) )
-			return false;
-
+			MyApplication::exit();
+		
+		if (_currentScene != NULL)
+			_currentScene->update(evt);
 		return true;
 }
 
-bool MyFrameListener::frameEnded(const Ogre::FrameEvent& evt)
+
+bool ApplicationListener::frameEnded(const Ogre::FrameEvent& evt)
 {
 	return true;
 }
 
-bool MyFrameListener::frameRenderingQueued(const Ogre::FrameEvent& evt)
+bool ApplicationListener::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
 	return true;
 }

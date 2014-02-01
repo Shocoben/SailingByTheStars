@@ -1,40 +1,23 @@
+#include "MyApplication.h"
+#include "ApplicationListener.h"
 #include "Scene.h"
 #include "GameObject.h"
 
-Scene::Scene(Ogre::RenderWindow* win, Ogre::Root* root) : MyFrameListener(win, root), _movementSpeed(50.0f), _movingObject(NULL)
+Scene::Scene( MyApplication* app ) : _application(app), _appListener(app->getAppListener()), _listenerID(_appListener->getLastSceneID())
 {
-	_sceneManager = root->createSceneManager(Ogre::ST_GENERIC);
-	
-	createCameras(win);
-	createScene();
-	
+	_appListener->addScene(this);
 }
 
 Scene::~Scene()
 {
-
-}
-
-void Scene::createCameras(Ogre::RenderWindow* win)
-{
-
+	
 }
 
 GameObject* nGO;
 
-void Scene::createScene()
-{
-
-}
-
 Ogre::SceneManager* Scene::sceneManager()
 {
 	return _sceneManager;
-}
-
-bool Scene::frameStarted(const Ogre::FrameEvent& evt)
-{
-
 }
 
 int Scene::getLastGOListLength()

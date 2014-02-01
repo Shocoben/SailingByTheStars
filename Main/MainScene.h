@@ -2,19 +2,22 @@
 #include "scene.h"
 class MainScene :public Scene
 {
+
 protected :
 	Ogre::Sphere* _skySphere;
 	GameObject* _movingObject;
-	GameObject** _stars;
 	int _nbrStars;
+	GameObject** _stars;
+
 	float _movementSpeed;
 
 public:
-	MainScene(Ogre::RenderWindow* win, Ogre::Root* root);
+	MainScene(MyApplication* app);
 	virtual ~MainScene(void);
 	virtual void createCameras(Ogre::RenderWindow* win);
 	virtual void createScene();
-	virtual bool frameStarted(const Ogre::FrameEvent& evt); 
+	virtual bool update(const Ogre::FrameEvent& evt); 
+	virtual void load();
 	void createStars();
 
 
