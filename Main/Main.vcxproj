@@ -54,13 +54,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Ogre\include;C:\Ogre\include\OGRE;C:\Ogre\boost;C:\Ogre\include\OIS;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Ogre\include;C:\Ogre\include\OGRE;C:\Ogre\include\OGRE\Terrain;C:\Ogre\boost;C:\Ogre\include\OIS;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\Ogre\lib\debug;C:\Ogre\boost\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OgreMain_d.lib;OgreOverlay_d.lib;OIS_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OgreMain_d.lib;OgreOverlay_d.lib;OIS_d.lib;OgreTerrain_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -82,6 +82,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Boat.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="main.cpp" />
@@ -90,15 +91,34 @@
     <ClCompile Include="MyApplication.cpp" />
     <ClCompile Include="ApplicationListener.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="Star.cpp" />
+    <ClCompile Include="TerrainGeneratorB.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Boat.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="MainScene.h" />
     <ClInclude Include="MathP.h" />
     <ClInclude Include="MyApplication.h" />
     <ClInclude Include="ApplicationListener.h" />
+    <ClInclude Include="RapidXML\rapidxml.hpp" />
+    <ClInclude Include="RapidXML\rapidxml_iterators.hpp" />
+    <ClInclude Include="RapidXML\rapidxml_print.hpp" />
+    <ClInclude Include="RapidXML\rapidxml_utils.hpp" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="Star.h" />
+    <ClInclude Include="TerrainGeneratorB.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\BuildRepo\media\materials\scripts\diffuse.material" />
+    <None Include="..\BuildRepo\media\materials\scripts\Ocean.material" />
+    <None Include="..\BuildRepo\myResources_d.cfg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\BuildRepo\media\terraint.xml">
+      <SubType>Designer</SubType>
+    </Xml>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

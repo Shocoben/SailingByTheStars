@@ -5,16 +5,21 @@
 int main()
 {
 	MyApplication app("SailingByTheStars");
-	
-	app.go();
-	
-	MainScene* scene = new MainScene(&app);
-	app.getAppListener()->loadScene(scene);
-	
-	while( MyApplication::keepRunning() )
-	{
-		app.update( );
-	}
+	int startR = app.go();
 
+	if (startR == 0)
+	{
+		MainScene* scene = new MainScene(&app, "media/terraint.xml");
+		app.getAppListener()->loadScene(scene);
+	
+		while( MyApplication::keepRunning() == true )
+		{
+			app.update( );
+		}
+	}
+	else
+	{
+		return startR;
+	}
 	return 0;
 }

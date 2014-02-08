@@ -13,6 +13,16 @@ Scene::~Scene()
 	
 }
 
+ApplicationListener* Scene::getAppListener()
+{
+	return _appListener;
+}
+
+Camera* Scene::getMainCamera()
+{
+	return _mainCamera;
+}
+
 GameObject* nGO;
 
 Ogre::SceneManager* Scene::sceneManager()
@@ -45,4 +55,30 @@ void Scene::removeFromScene(GameObject* gameObject)
 	_gameObjectsList.erase(itGO);
 
 
+}
+
+bool Scene::mouseMoved (const OIS::MouseEvent &arg)
+{
+	return true;
+}
+
+bool Scene::mousePressed (const OIS::MouseEvent &arg, OIS::MouseButtonID id)
+{
+	std::cout << "Scene Mouse Pressed" << std::endl;
+	return true;
+}
+
+bool Scene::mouseReleased (const OIS::MouseEvent &arg, OIS::MouseButtonID id)
+{
+	return true;
+}
+
+bool Scene::keyReleased (const OIS::KeyEvent &arg)
+{
+	return true;
+}
+
+bool Scene::keyPressed (const OIS::KeyEvent &arg)
+{
+	return true;
 }

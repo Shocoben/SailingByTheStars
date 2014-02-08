@@ -18,9 +18,10 @@ public :
 	void objectHaveBeenErasedFromlist(const unsigned int objSceneID);
 	unsigned int getSceneID();
 
+	virtual void update(const Ogre::FrameEvent& evt);
+
 	SceneNode* getNode();
-
-
+	SceneNode* getNode() const;
 	~GameObject(void);
 protected :
 	Scene* _myScene;

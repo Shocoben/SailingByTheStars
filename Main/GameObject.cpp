@@ -7,6 +7,11 @@ GameObject::GameObject()
 
 }
 
+void GameObject::update(const Ogre::FrameEvent& evt)
+{
+	
+}
+
 GameObject::GameObject(Scene* myScene) : _node(myScene->sceneManager()->getRootSceneNode()->createChildSceneNode() ), _myScene(myScene), _collider( new SphereCollider( Vector3( 0,0,0 ), _node, 3 ) )
 {
 	_myScene->addToScene(this);
@@ -18,6 +23,12 @@ GameObject::GameObject(Scene* myScene, const String &name) : _node(myScene->scen
 }
 
 SceneNode* GameObject::getNode()
+{
+	return _node;
+}
+
+
+SceneNode* GameObject::getNode() const
 {
 	return _node;
 }

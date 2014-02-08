@@ -20,7 +20,31 @@ bool solveQuadratic(const T &a, const T &b, const T &c, T &x0, T &x1)
 }
 
 
-std::pair<bool, Ogre::Real> MathP::rayIntersectSphere(Ogre::Ray& ray, const Ogre::Sphere& s)
+Ogre::Vector3 MathP::Vector3Lerp (Ogre::Vector3 &srcLocation, Ogre::Vector3 &destLocation, Ogre::Real Time)
+{
+	return srcLocation * (1 - Time) + destLocation * Time;
+}
+
+Ogre::Vector3 MathP::Vector3Slerp(Ogre::Vector3 &srcLocation, Ogre::Vector3 &destLocation, Ogre::Real Time)
+{
+	    // Dot product - the cosine of the angle between 2 vectors.
+	Ogre::Real dot = srcLocation.dotProduct(destLocation);
+     // Clamp it to be in the range of Acos()
+     // This may be unnecessary, but floating point
+     // precision can be a fickle mistress.
+	 Math::Clamp(dot, -1.0f, 1.0f);
+     // Acos(dot) returns the angle between start and end,
+     // And multiplying that by percent returns the angle between
+     // start and the final result.
+	 
+	 Ogre::Radian theta = Math::ACos(dot)*Time;
+	 Vector3 RelativeVec = destLocation - srcLocation*dot;
+	 RelativeVec.normalise();    // Orthonormal basis
+     // The final result.
+	 return ((srcLocation*Math::Cos(theta)) + (RelativeVec*Math::Sin(theta)));
+}
+
+std::pair<bool, Ogre::Real> MathP::rayIntersectSphere(const Ogre::Ray& ray, const Ogre::Sphere& s)
 {
 		Ogre::Vector3 c = s.getCenter();
 		bool OriginInsideTheSpere = (ray.getOrigin().distance( c ) < s.getRadius() )? true : false;

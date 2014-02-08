@@ -15,6 +15,7 @@ protected :
 	std::vector<Scene*> _scenes;
 	Scene* _currentScene;
 	MyApplication* _application;
+	bool leftButtonDown;
 
 public :
 	ApplicationListener( MyApplication* app);

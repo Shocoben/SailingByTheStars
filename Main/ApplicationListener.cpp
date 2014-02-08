@@ -23,8 +23,8 @@ ApplicationListener::ApplicationListener(MyApplication* app) : _application(app)
 			pl.insert(std::make_pair(std::string("XAutoRepeatOn"), std::string("true")));
 	#endif
 	_inputManager = OIS::InputManager::createInputSystem(pl);
-	_keyboard = static_cast<OIS::Keyboard*>(_inputManager->createInputObject( OIS::OISKeyboard, false ));
-	_mouse = static_cast<OIS::Mouse*>(_inputManager->createInputObject(OIS::OISMouse, false));
+	_keyboard = static_cast<OIS::Keyboard*>(_inputManager->createInputObject( OIS::OISKeyboard, true ));
+	_mouse = static_cast<OIS::Mouse*>(_inputManager->createInputObject(OIS::OISMouse, true));
 }
 
 int ApplicationListener::getLastSceneID()
@@ -34,8 +34,14 @@ int ApplicationListener::getLastSceneID()
 
 void ApplicationListener::loadScene(Scene* scene)
 {
-		_currentScene = scene;
+
+	_currentScene = scene;
+	if (scene != NULL)
+	{
 		_currentScene->load();
+		_mouse->setEventCallback(_currentScene);
+		_keyboard->setEventCallback(_currentScene);
+	}
 }
 
 
@@ -57,8 +63,10 @@ void ApplicationListener::setMouseViewportSize(Ogre::Viewport* viewPort)
 
 ApplicationListener::~ApplicationListener()
 {
+	
 	_inputManager->destroyInputObject( _keyboard );
 	_inputManager->destroyInputObject( _mouse );
+
 	OIS::InputManager::destroyInputSystem( _inputManager );
 }
 
@@ -69,9 +77,10 @@ bool ApplicationListener::frameStarted(const Ogre::FrameEvent& evt)
 		
 		if ( _keyboard->isKeyDown( OIS::KC_ESCAPE ) )
 			MyApplication::exit();
-		
+
+
 		if (_currentScene != NULL)
-			_currentScene->update(evt);
+			return _currentScene->update(evt);
 		return true;
 }
 

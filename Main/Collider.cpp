@@ -1,5 +1,6 @@
 #include "Collider.h"
 #include "GameObject.h"
+#include "MathP.h"
 
 //COLLIDER TRANSFORM
 ColliderTransform::ColliderTransform(const Ogre::Vector3& position) : _position(position)
@@ -30,8 +31,6 @@ ColliderTransformNode::ColliderTransformNode(const Ogre::Vector3& position, cons
 
 const Ogre::Vector3& ColliderTransformNode::getAbsolutePosition() const
 {
-
-
 	return _node->_getDerivedPosition() + _position;
 }
 
@@ -41,6 +40,11 @@ const Ogre::Vector3& ColliderTransformNode::getAbsolutePosition()
 }
 
 const Ogre::Node* ColliderTransformNode::getNode()
+{
+	return _node;
+}
+
+const Ogre::Node* ColliderTransformNode::getNode() const
 {
 	return _node;
 }
@@ -72,7 +76,7 @@ const BaseCollider::ColliderType& BaseCollider::getColliderType() const
 	return _type;
 }
 
-const ColliderTransform* BaseCollider::getTransform()
+ColliderTransform* BaseCollider::getTransform()
 {
 	return _transform;
 }
@@ -103,7 +107,18 @@ bool PointCollider::collideWith(const SphereCollider& sphere)
 	return collision(sphere, _transform->getAbsolutePosition());
 }
 
+bool PointCollider::collideWith(const SphereCollider& sphere) const
+{
+	std::cout << "sphere" << std::endl;
+	return collision(sphere, _transform->getAbsolutePosition());
+}
+
 bool PointCollider::collideWith(const BoxColliderAABB& box)
+{
+	return collision(box, _transform->getAbsolutePosition());
+}
+
+bool PointCollider::collideWith(const BoxColliderAABB& box) const
 {
 	return collision(box, _transform->getAbsolutePosition());
 }
@@ -113,45 +128,64 @@ bool PointCollider::collideWith(const Ogre::Vector3& point)
 	return false;
 }
 
+bool PointCollider::collideWith(const Ogre::Vector3& point) const
+{
+	return false;
+}
+
 bool PointCollider::collideWith(const PointCollider& Vector3)
 {
 	return false;
 }
 
-bool PointCollider::collideWith(const BaseCollider* base)
+bool PointCollider::collideWith(const PointCollider& Vector3) const
 {
-	BaseCollider* nBase = const_cast<BaseCollider*>(base);
-	return collideWith(nBase);
+	return false;
 }
 
-bool PointCollider::collideWith(BaseCollider* base)
+std::pair<bool, Ogre::Real> PointCollider::collideWith(const Ogre::Ray& ray)
+{
+	return std::make_pair(false, 0);
+}
+
+std::pair<bool, Ogre::Real> PointCollider::collideWith(const Ogre::Ray& ray) const
+{
+	return std::make_pair(false, 0);
+}
+
+
+bool PointCollider::collideWith(const BaseCollider* base)
+{
+	return	static_cast<const PointCollider &>( *this ).collideWith(base);
+}
+
+bool PointCollider::collideWith(const BaseCollider* base) const
 {
 	if (base->getColliderType() == ColliderType::sphere)
 	{
-		std::cout<<"sphere" << std::endl;
-		SphereCollider* nCollider = dynamic_cast<SphereCollider*>(base); 
+		const SphereCollider* nCollider = static_cast<const SphereCollider*>(base); 
 		return collision(*nCollider, _transform->getAbsolutePosition());
 	}
 	else if (base->getColliderType() == ColliderType::boxAABB)
 	{
-		BoxColliderAABB* nCollider = dynamic_cast<BoxColliderAABB*>(base);
+		const BoxColliderAABB* nCollider = static_cast<const BoxColliderAABB*>(base);
 		return collision(*nCollider, _transform->getAbsolutePosition());
 	}
 	return FALSE;
 }
 
 //SphereCollider
-SphereCollider::SphereCollider(ColliderTransform* transform, const float radius) : BaseCollider(transform, ColliderType::sphere), _radius(radius)
+SphereCollider::SphereCollider(ColliderTransform* transform, const float radius) : BaseCollider(transform, ColliderType::sphere), _radius(radius), _sphere(new Ogre::Sphere(transform->getAbsolutePosition(), radius))
 {
 
 }
 
-SphereCollider::SphereCollider(const Ogre::Vector3& position, const float radius) : BaseCollider(position, ColliderType::sphere), _radius(radius)
+SphereCollider::SphereCollider(const Ogre::Vector3& position, const float radius) : BaseCollider(position, ColliderType::sphere), _radius(radius), _sphere(new Ogre::Sphere(position, radius))
 {
 
 }
 
-SphereCollider::SphereCollider(const Ogre::Vector3& position, const Ogre::Node* node, const float radius) : BaseCollider(position, node, ColliderType::sphere), _radius(radius)
+SphereCollider::SphereCollider(const Ogre::Vector3& position, const Ogre::Node* node, const float radius) : BaseCollider(position, node, ColliderType::sphere), _radius(radius), _sphere(new Ogre::Sphere(position, radius))
 {
 
 }
@@ -161,7 +195,17 @@ bool SphereCollider::collideWith(const SphereCollider& sphere)
 	return collision(sphere, *this);
 }
 
+bool SphereCollider::collideWith(const SphereCollider& sphere) const
+{
+	return collision(sphere, *this);
+}
+
 bool SphereCollider::collideWith(const BoxColliderAABB& box)
+{
+	return collision(*this, box);
+}
+
+bool SphereCollider::collideWith(const BoxColliderAABB& box) const
 {
 	return collision(*this, box);
 }
@@ -171,30 +215,58 @@ bool SphereCollider::collideWith(const Ogre::Vector3& point)
 	return collision(*this, point);
 }
 
+bool SphereCollider::collideWith(const Ogre::Vector3& point) const
+{
+	return collision(*this, point);
+}
+
 bool SphereCollider::collideWith(const PointCollider& point)
 {
 	return collision(*this, point);
 }
 
-bool SphereCollider::collideWith(BaseCollider* base)
+bool SphereCollider::collideWith(const PointCollider& point) const
+{
+	return collision(*this, point);
+}
+
+std::pair<bool, Ogre::Real> SphereCollider::collideWith(const Ogre::Ray& ray)
+{
+	_sphere->setCenter( _transform->getAbsolutePosition() );
+	return MathP::rayIntersectSphere(ray, *_sphere);
+}
+
+std::pair<bool, Ogre::Real> SphereCollider::collideWith(const Ogre::Ray& ray) const
+{
+	_sphere->setCenter( _transform->getAbsolutePosition() );
+	return MathP::rayIntersectSphere(ray, *_sphere);
+}
+
+bool SphereCollider::collideWith(const BaseCollider* base) const 
 {
 	if (base->getColliderType() == ColliderType::sphere)
 	{
-		SphereCollider* nCollider = dynamic_cast<SphereCollider*>(base); 
+		const SphereCollider* nCollider = static_cast<const SphereCollider*>(base); 
 		return collision(*nCollider, *this);
 	}
 	else if (base->getColliderType() == ColliderType::boxAABB)
 	{
-		BoxColliderAABB* nCollider = dynamic_cast<BoxColliderAABB*>(base);
+		const BoxColliderAABB* nCollider = static_cast<const BoxColliderAABB*>(base);
 		return collision(*this, *nCollider);
 	}
 	else if (base->getColliderType() == ColliderType::point)
 	{
-		PointCollider* nCollider = dynamic_cast<PointCollider*>(base);
+		const PointCollider* nCollider = static_cast<const PointCollider*>(base);
 		return collision(*this, nCollider->getTransform()->getAbsolutePosition());
 	}
 	return FALSE;
 }
+
+bool SphereCollider::collideWith(const BaseCollider* base) 
+{
+	return static_cast<const SphereCollider &>( *this ).collideWith(base);
+}
+
 
 const float& SphereCollider::getRadius()
 {
@@ -209,6 +281,7 @@ const float& SphereCollider::getRadius() const
 void SphereCollider::setRadius(const float nRadius)
 {
 	_radius = nRadius;
+	_sphere->setRadius(nRadius);
 }
 
 //BoxAABBCollider
@@ -232,7 +305,17 @@ bool BoxColliderAABB::collideWith(const SphereCollider& sphere)
 	return collision(sphere, *this);
 }
 
+bool BoxColliderAABB::collideWith(const SphereCollider& sphere) const
+{
+	return collision(sphere, *this);
+}
+
 bool BoxColliderAABB::collideWith(const BoxColliderAABB& box)
+{
+	return collision(*this, box);
+}
+
+bool BoxColliderAABB::collideWith(const BoxColliderAABB& box) const
 {
 	return collision(*this, box);
 }
@@ -242,26 +325,55 @@ bool BoxColliderAABB::collideWith(const Ogre::Vector3& point)
 	return collision(*this, point);
 }
 
+bool BoxColliderAABB::collideWith(const Ogre::Vector3& point) const
+{
+	return collision(*this, point);
+}
+
 bool BoxColliderAABB::collideWith(const PointCollider& point)
 {
 	return collision(*this, point);
 }
 
-bool BoxColliderAABB::collideWith(BaseCollider* base)
+bool BoxColliderAABB::collideWith(const PointCollider& point) const
+{
+	return collision(*this, point);
+}
+
+std::pair<bool, Ogre::Real> BoxColliderAABB::collideWith(const Ogre::Ray& ray) const
+{
+	Ogre::Vector3 boxPos = _transform->getAbsolutePosition();
+	Ogre::Vector3 relativeScale = getScale() * 0.5;
+
+	Ogre::AxisAlignedBox alignedBox(boxPos.x - relativeScale.x, boxPos.x - relativeScale.y, boxPos.z - relativeScale.z, boxPos.x + relativeScale.x, boxPos.y + relativeScale.y, boxPos.z + relativeScale.z);
+
+	return Ogre::Math::intersects(ray, alignedBox);
+}
+
+std::pair<bool, Ogre::Real> BoxColliderAABB::collideWith(const Ogre::Ray& ray)
+{
+	return static_cast<const BoxColliderAABB &>( *this ).collideWith(ray);
+}
+bool BoxColliderAABB::collideWith(const BaseCollider* base)
+{
+	return static_cast<const BoxColliderAABB &>( *this ).collideWith(base);
+}
+
+bool BoxColliderAABB::collideWith(const BaseCollider* base) const
 {
 	if (base->getColliderType() == ColliderType::sphere)
 	{
-		SphereCollider* nCollider = dynamic_cast<SphereCollider*>(base); 
+		const SphereCollider* nCollider = static_cast<const SphereCollider*>(base); 
 		return collision(*nCollider, *this);
 	}
 	else if (base->getColliderType() == ColliderType::boxAABB)
 	{
-		BoxColliderAABB* nCollider = dynamic_cast<BoxColliderAABB*>(base);
+		const BoxColliderAABB* nCollider = static_cast<const BoxColliderAABB*>(base);
 		return collision(*this, *nCollider);
 	}
 	else if (base->getColliderType() == ColliderType::point)
 	{
-		PointCollider* nCollider = dynamic_cast<PointCollider*>(base);
+		const PointCollider* nCollider = static_cast<const PointCollider*>(base);
 		return collision(*this, *nCollider);
 	}
 	return FALSE;

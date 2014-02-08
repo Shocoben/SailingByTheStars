@@ -32,6 +32,8 @@ class MyApplication
 		static bool keepRunning();
 
 		static void exit();
+		void createColourCube();
+
 
 		ApplicationListener* getAppListener();
 

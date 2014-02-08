@@ -26,6 +26,7 @@ public:
 	virtual const Ogre::Vector3& getAbsolutePosition();
 	virtual const Ogre::Vector3& getAbsolutePosition() const;
 	const Ogre::Node* getNode();
+	const Ogre::Node* getNode() const;
 };
 
 
@@ -37,7 +38,7 @@ public :
 	const ColliderType& getColliderType();
 	const ColliderType& getColliderType() const;
 
-	const ColliderTransform* getTransform();
+	ColliderTransform* getTransform();
 	const ColliderTransform* getTransform() const;
 
 	BaseCollider(ColliderTransform* transform, ColliderType type);
@@ -49,6 +50,15 @@ public :
 	virtual bool collideWith(const Ogre::Vector3& point) = 0;
 	virtual bool collideWith(const SphereCollider& sphere) = 0;
 	virtual bool collideWith(const PointCollider& point) = 0;
+	virtual std::pair<bool, Ogre::Real> collideWith(const Ogre::Ray& ray) = 0;
+
+	//const
+	virtual bool collideWith(const BoxColliderAABB& box) const = 0;
+	virtual bool collideWith(const Ogre::Vector3& point) const= 0;
+	virtual bool collideWith(const SphereCollider& sphere) const= 0;
+	virtual bool collideWith(const PointCollider& point) const= 0;
+	virtual std::pair<bool, Ogre::Real> collideWith(const Ogre::Ray& ray) const= 0;
+
 
 	static bool collision(const BoxColliderAABB& box, const Ogre::Vector3& point);
 	static bool collision(const SphereCollider& sphere, const Ogre::Vector3& point);
@@ -79,9 +89,15 @@ public :
 	virtual bool collideWith(const Ogre::Vector3& point);
 	virtual bool collideWith(const SphereCollider& sphere);
 	virtual bool collideWith(const PointCollider& point);
+	virtual std::pair<bool, Ogre::Real> collideWith(const Ogre::Ray& ray);
+	bool collideWith(const BaseCollider* base);
 
-	bool collideWith( BaseCollider* base);
-	bool collideWith( const BaseCollider* base);
+	virtual bool collideWith(const BoxColliderAABB& box) const;
+	virtual bool collideWith(const Ogre::Vector3& point) const;
+	virtual bool collideWith(const SphereCollider& sphere) const;
+	virtual bool collideWith(const PointCollider& point) const;
+	virtual std::pair<bool, Ogre::Real> collideWith(const Ogre::Ray& ray) const;
+	bool collideWith(const BaseCollider* base) const;
 };
 
 
@@ -89,6 +105,8 @@ class SphereCollider : public BaseCollider //There is a problem: I can't become 
 {
 private :
 	float _radius;
+	Ogre::Sphere* _sphere;
+
 public : 
 	SphereCollider(ColliderTransform* transform, const float radius);
 	SphereCollider(const Ogre::Vector3& position, const float radius);
@@ -98,8 +116,15 @@ public :
 	virtual bool collideWith(const Ogre::Vector3& point);
 	virtual bool collideWith(const SphereCollider& sphere);
 	virtual bool collideWith(const PointCollider& point);
+	virtual std::pair<bool, Ogre::Real> collideWith(const Ogre::Ray& ray);
+	bool collideWith(const BaseCollider* base);
 
-	bool collideWith( BaseCollider* base);
+	virtual bool collideWith(const BoxColliderAABB& box) const;
+	virtual bool collideWith(const Ogre::Vector3& point) const;
+	virtual bool collideWith(const SphereCollider& sphere) const;
+	virtual bool collideWith(const PointCollider& point) const;
+	virtual std::pair<bool, Ogre::Real> collideWith(const Ogre::Ray& ray) const;
+	bool collideWith(const BaseCollider* base) const;
 
 	const float& getRadius();
 	const float& getRadius() const;
@@ -120,8 +145,15 @@ public :
 	virtual bool collideWith(const Ogre::Vector3& point);
 	virtual bool collideWith(const SphereCollider& sphere);
 	virtual bool collideWith(const PointCollider& point);
+	std::pair<bool, Ogre::Real> collideWith(const Ogre::Ray& ray);
+	bool collideWith(const BaseCollider* base);
 
-	bool collideWith( BaseCollider* base);
+	virtual bool collideWith(const BoxColliderAABB& box) const;
+	virtual bool collideWith(const Ogre::Vector3& point) const;
+	virtual bool collideWith(const SphereCollider& sphere) const;
+	virtual bool collideWith(const PointCollider& point) const;
+	std::pair<bool, Ogre::Real> collideWith(const Ogre::Ray& ray) const;
+	bool collideWith(const BaseCollider* base) const;
 
 	const Ogre::Vector3& getScale();
 	const Ogre::Vector3& getScale() const;

@@ -1,5 +1,7 @@
 #pragma once
 #include "Ogre.h"
+#include "OIS.h"
+
 
 class Scene;
 class GameObject;
@@ -8,7 +10,7 @@ class MyApplication;
 
 using namespace Ogre;
 
-class Scene
+class Scene : public OIS::MouseListener, public OIS::KeyListener
 {
 public :
 	Scene(MyApplication* app);
@@ -20,12 +22,13 @@ public :
 	void addToScene(GameObject* object);
 	void removeFromScene( GameObject* object);
 	int getLastGOListLength();
+	Camera* getMainCamera();
+	ApplicationListener* getAppListener();
 
 	Ogre::SceneManager* sceneManager();
 
 protected :
-	Plane* _waterPlane;
-	Camera* _camera;
+	Camera* _mainCamera;
 	Viewport* _viewport;
 	
 	MyApplication* _application;
@@ -34,5 +37,12 @@ protected :
 	
 	std::vector<GameObject*> _gameObjectsList;
 	int _listenerID;
+
+	virtual bool mouseMoved (const OIS::MouseEvent &arg);
+	virtual bool mousePressed (const OIS::MouseEvent &arg, OIS::MouseButtonID id);
+	virtual bool mouseReleased (const OIS::MouseEvent &arg, OIS::MouseButtonID id);
+	virtual bool keyPressed (const OIS::KeyEvent &arg);
+	virtual bool keyReleased (const OIS::KeyEvent &arg);
+
 };
 

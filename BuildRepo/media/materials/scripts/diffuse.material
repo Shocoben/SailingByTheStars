@@ -1,0 +1,10 @@
+material Diffuse
+{
+    technique
+    {
+        pass
+        {
+            ambient vertexcolour
+        }
+    }
+}
