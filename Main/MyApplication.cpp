@@ -1,6 +1,7 @@
 #include "MyApplication.h"
 #include "ApplicationListener.h"
 
+
 std::map<std::string, MyApplication*> createMap()
 {
 	std::map<std::string, MyApplication*> map;
@@ -20,7 +21,12 @@ void MyApplication::exit()
 	_keepRunning = false;
 }
 
-MyApplication::MyApplication(const std::string& appName)
+const xml_node<>* MyApplication::getRootXMLNode()
+{
+	return _rootXMLNode;
+}
+
+MyApplication::MyApplication(const std::string& appName, const std::string& xmlFile)
 {
 		_root = NULL;
 		_window = NULL;
@@ -30,6 +36,23 @@ MyApplication::MyApplication(const std::string& appName)
 		_appName = appName;
 		
 		//appsByName[_appName] = this;
+
+		std::stringstream stringXML;
+		std::ifstream infile;
+		infile.open(xmlFile);
+
+		std::string string;
+		while(!infile.eof())
+		{
+			std::getline(infile, string);
+			stringXML << string;
+		}
+		infile.close();
+
+		std::cout<<stringXML.str() << std::endl;
+		_xmlChar = strdup(stringXML.str().c_str());
+		_docXML.parse<0>(_xmlChar);
+		_rootXMLNode = _docXML.first_node("ApplicationDescription");
 }
 
 ApplicationListener* MyApplication::getAppListener()
@@ -39,6 +62,8 @@ ApplicationListener* MyApplication::getAppListener()
 
 MyApplication::~MyApplication()
 {
+	
+	delete _xmlChar;
 	delete _root;
 }
 
@@ -76,7 +101,6 @@ bool MyApplication::loadResources(std::string path)
 	Ogre::ConfigFile::SectionIterator sectionIter = cf.getSectionIterator();
 
 	Ogre::String sectionName, typeName, dataPath;
-
 	
 	while(sectionIter.hasMoreElements())
 	{
@@ -92,7 +116,6 @@ bool MyApplication::loadResources(std::string path)
 	}
 
 	createColourCube();
-
 	return true;
 }
 

@@ -8,24 +8,9 @@
 #include "OgreTerrain.h"
 #include "TerrainGeneratorB.h"
 
-MainScene::MainScene(MyApplication* app, const char* configFile) : Scene( app), _nbrStars(1), _stars(new Star*[_nbrStars]), _movementSpeed(50.0f), _movingStar(NULL), _boats(new Boat*[_nbrStars]), _xmlChar(NULL)
+MainScene::MainScene(MyApplication* app, const xml_node<>* rootNode) : Scene( app, rootNode), _nbrStars(1), _stars(new Star*[_nbrStars]), _movementSpeed(50.0f), _movingStar(NULL), _boats(new Boat*[_nbrStars])
 {
-	std::stringstream stringXML;
-	std::ifstream infile;
-	infile.open(configFile);
 
-	std::string string;
-	while(!infile.eof())
-	{
-		std::getline(infile, string);
-		stringXML << string;
-	}
-	infile.close();
-
-	std::cout<<stringXML.str() << std::endl;
-	_xmlChar = strdup(stringXML.str().c_str());
-	_doc.parse<0>(_xmlChar);
-	_rootNode = _doc.first_node("LevelDescription");
 }
 
 
@@ -41,7 +26,6 @@ MainScene::~MainScene(void)
 	_terrain->freeTemporaryResources();
 	delete [] _stars;
 	delete [] _boats;
-	delete _xmlChar;
 	Scene::~Scene();
 }
 
@@ -95,8 +79,6 @@ void MainScene::createTerrain()
 	}
 	imp.layerList.resize(count);
 
-
-	
 	count = 0;
 	for (xml_node<>* layerNode = terrainNode->first_node("Layer"); layerNode != NULL; layerNode = layerNode->next_sibling())
 	{
@@ -111,6 +93,163 @@ void MainScene::createTerrain()
 
 	_terrain->prepare(imp);
 	_terrain->load();
+	createFogMesh();
+}
+
+void MainScene::readPixelFromTexture(Ogre::TexturePtr texturePtr,Ogre::Vector3* output)
+{
+	unsigned char* datas = new unsigned char[texturePtr->getWidth() * texturePtr->getHeight() * 3];
+	texturePtr->getBuffer()->blitToMemory(PixelBox(texturePtr->getWidth(), texturePtr->getHeight(),1, PF_R8G8B8, datas));
+
+	for (int y = 0; y < texturePtr->getHeight(); ++y)
+	{
+		for (int x = 0; x < texturePtr->getWidth(); ++x)
+		{
+			unsigned char r = datas[(x + y * texturePtr->getWidth()) * 3];
+			unsigned char g = datas[(x + 1 + y * texturePtr->getWidth()) * 3];
+			unsigned char b = datas[(x + 2 + y * texturePtr->getWidth()) * 3];
+
+			std::cout << " r " << r << " g " << g << " b " << b << std::endl;
+		}
+	}
+}
+
+void MainScene::createFogMesh()
+{
+	xml_node<>* terrainNode = _rootNode->first_node("Planes");
+	
+	//Get the XML attributes for the segments of the plane and the minY
+	int segX = atoi(terrainNode->first_attribute("fogPlaneSegX")->value()); 
+	int segY = atoi(terrainNode->first_attribute("fogPlaneSegY")->value());
+	double minY = atof(terrainNode->first_attribute("fogMinY")->value());
+
+	//FogMesh
+	Ogre::MeshPtr fogMesh = Ogre::MeshManager::getSingleton().createManual("FogPlane", "General");
+	Ogre::SubMesh* subMesh = fogMesh->createSubMesh();
+
+	//calculates the counts
+	int nbrVertices = segX * segY;
+	int nbrPositions = 3 * segX * segY;
+	int nbrUVs = 2 * segX * segY;
+	int nbrTriangles = (segX - 1) * (segY - 1) * 3 * 2;
+	
+	//init arrays
+	float* positions= new float[nbrPositions];
+	float* normals = new float[nbrPositions];
+	float* uvs = new float[nbrUVs];
+	unsigned short* triangles= new unsigned short[nbrTriangles];
+
+	//Indexes
+	int vertexI = 0;
+	int cTriangle = 0;
+	
+	//needed pointers
+	Vector3 *point = new Vector3(0,0,0); //actual point information
+	Vector3* cNormal = new Vector3(0,0,0); //will be used for the normal
+
+	float halfWorldSize = _terrain->getWorldSize() * 0.5; //will be used for the getPoint on the map
+	for (int z = 0; z < segY; ++z)
+	{
+		for (int x = 0; x < segX; ++x)
+		{
+			int vArrayIndex = x * 3 + z * segX * 3;
+			int uvArrayIndex = x * 2 + z * segX * 2;
+
+			//Get the position on the terrain with a normalized relative pos ((0, 0) is bottom left and (1, 1) top right of the map)
+			//Gives the UV too.
+			float rPosX = ((float) x / (float) (segX - 1));
+			float rPosZ = ((float) z / (float) (segY - 1));
+			_terrain->getPoint(halfWorldSize * rPosX, halfWorldSize * rPosZ, point); //in getPoint function(0,0) is the bottom left of the map and (halfWorldSize, halfWordSize) is the top right of the map
+			
+			//position
+			positions[vArrayIndex] = point->x;
+			positions[vArrayIndex + 1] = (point->y > minY)? point->y + minY: minY;
+			positions[vArrayIndex + 2] = point->z;
+
+			//normals
+			normals[vArrayIndex] = 0;
+			normals[vArrayIndex + 1] = 1;
+			normals[vArrayIndex + 2] = 0;
+			
+			//UV
+			uvs[uvArrayIndex] = rPosX;
+			uvs[uvArrayIndex + 1] = rPosZ;
+
+			//triangles
+			if (x < segX - 1 && z < segY - 1)
+			{
+				
+				triangles[cTriangle] = vertexI;
+				triangles[cTriangle+1] = vertexI + segX + 1;
+				triangles[cTriangle+2] = vertexI + segX;
+				cTriangle += 3;
+
+				triangles[cTriangle] = vertexI ;
+				triangles[cTriangle+1] = vertexI + 1;
+				triangles[cTriangle+2] = vertexI + segX + 1;
+				cTriangle += 3;
+			}
+
+			vertexI++;
+		}
+	}
+
+
+
+	fogMesh->sharedVertexData = new Ogre::VertexData;
+	fogMesh->sharedVertexData->vertexCount = nbrVertices;
+
+	Ogre::VertexDeclaration* decl = fogMesh->sharedVertexData->vertexDeclaration;
+	size_t offset = 0;
+	//positions
+	decl->addElement(0, offset, Ogre::VET_FLOAT3, Ogre::VES_POSITION);
+	offset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
+
+	//Register verticesInfos  in buffers
+	Ogre::HardwareVertexBufferSharedPtr posBuffer = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(offset, fogMesh->sharedVertexData->vertexCount, Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+	posBuffer->writeData(0, posBuffer->getSizeInBytes(), positions);
+	fogMesh->sharedVertexData->vertexBufferBinding->setBinding(0, posBuffer);
+
+	//register normals
+	offset = 0;
+	decl->addElement(1, offset, Ogre::VET_FLOAT3, Ogre::VES_NORMAL);
+	offset+= Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
+
+	Ogre::HardwareVertexBufferSharedPtr vNBuffer = Ogre::HardwareBufferManager::getSingletonPtr()->createVertexBuffer(offset, fogMesh->sharedVertexData->vertexCount, Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+	
+	vNBuffer->writeData(0, vNBuffer->getSizeInBytes(), normals);
+	fogMesh->sharedVertexData->vertexBufferBinding->setBinding(1, vNBuffer);
+	
+	//register UVs
+
+	offset = 0;
+	decl->addElement(2, offset, Ogre::VET_FLOAT2, Ogre::VES_TEXTURE_COORDINATES);
+	offset+= Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT2);
+
+	Ogre::HardwareVertexBufferSharedPtr UVBuffer = Ogre::HardwareBufferManager::getSingletonPtr()->createVertexBuffer(offset, fogMesh->sharedVertexData->vertexCount, Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+	UVBuffer->writeData(0, UVBuffer->getSizeInBytes(), uvs);
+
+	fogMesh->sharedVertexData->vertexBufferBinding->setBinding(2, UVBuffer);
+
+	//Register indexes
+	Ogre::HardwareIndexBufferSharedPtr indexBuffer = Ogre::HardwareBufferManager::getSingleton().createIndexBuffer(HardwareIndexBuffer::IT_16BIT, nbrTriangles, Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+	indexBuffer->writeData(0, indexBuffer->getSizeInBytes(), triangles, true);
+
+	subMesh->useSharedVertices = true;
+	subMesh->indexData->indexStart = 0;
+	subMesh->indexData->indexCount = nbrTriangles;
+	subMesh->indexData->indexBuffer = indexBuffer;
+
+	fogMesh->_setBounds(AxisAlignedBox(positions[0],minY, positions[nbrPositions-3 + 2], positions[nbrPositions-3] ,halfWorldSize, positions[2]));
+
+	fogMesh->load();
+
+	_fogEnt = _sceneManager->createEntity("Fog", "FogPlane");
+	Ogre::SceneNode* _fogSceneNode = _sceneManager->getRootSceneNode()->createChildSceneNode("FogSceneNode");
+	
+	_fogEnt->setMaterialName("FogOfWar");
+	_fogSceneNode->attachObject(_fogEnt);
+	
 }
 
 
@@ -173,30 +312,14 @@ void MainScene::createScene()
 	_waterPhysicPlane = new Ogre::Plane(Ogre::Vector3::UNIT_Y, atof(waterPlaneNode->first_attribute("waterPhysicPlaneY")->value()) );
 	_skySphere = new Sphere(Vector3(0,0,0), 60);
 	_skyPlane = new Ogre::Plane(Ogre::Vector3:: UNIT_Y, atof(waterPlaneNode->first_attribute("skyPlaneY")->value()) );
-	_fogPlane = new Ogre::Plane(Ogre::Vector3:: UNIT_Y, atof(waterPlaneNode->first_attribute("fogPlaneY")->value()) );
 	
-
+	/*
 	Ogre::MeshManager::getSingleton().createPlane("WaterMesh", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,*_waterPlane, atof(waterPlaneNode->first_attribute("waterMeshW")->value()), atof(waterPlaneNode->first_attribute("waterMeshH")->value()),150,150, true, 1, 7, 5, Ogre::Vector3::UNIT_Z);
 	Ogre::Entity* waterEnt = _sceneManager->createEntity("WaterEnt", "WaterMesh");
 	_sceneManager->getRootSceneNode()->createChildSceneNode()->attachObject(waterEnt);
 	waterEnt->setMaterialName("Ocean2_Cg");
-
-
-	/*
-	Ogre::MeshManager::getSingleton().createPlane("WarFogMesh", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,*_fogPlane, atof(waterPlaneNode->first_attribute("waterMeshW")->value()), atof(waterPlaneNode->first_attribute("waterMeshH")->value()),150,150, true, 1, 7, 5, Ogre::Vector3::UNIT_Z);
-	_fogEnt = _sceneManager->createEntity("FogEnt", "WarFogMesh");
-	_fogEnt->setMaterialName("Examples/BeachStones");
-	_fogNode = _sceneManager->getRootSceneNode()->createChildSceneNode();
-	_fogNode->attachObject(_fogEnt);*/
-
-	/*
-	Ogre::MeshManager::getSingleton().createPlane("SimplePlane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,*_waterPlane, 1000,1000,1,1, true, 1, 1, 1, Ogre::Vector3::UNIT_Z);
-	Ogre::Entity* groundEnt = _sceneManager->createEntity("WaterFloor", "SimplePlane");
-	Ogre::SceneNode* _groundNode = _sceneManager->getRootSceneNode()->createChildSceneNode();
-	_groundNode->translate(0,-8,0);
-	_groundNode->attachObject(groundEnt);
-	groundEnt->setMaterialName("OceanFloor");*/
-
+	*/
+	//createFogMesh();
 	createTerrain();
 	createBoatsAndStars();
 }

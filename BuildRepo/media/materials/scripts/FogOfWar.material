@@ -1,0 +1,38 @@
+fragment_program fogOfWarFragmentShader cg
+{
+	source fogOfWar.cg
+	entry_point MyFragmentShader
+	profiles ps_2_0 arbfp1	
+}
+
+vertex_program fogOfWarVertexShader cg
+{
+	source fogOfWar.cg
+	entry_point MyVertexShader
+	profiles vs_2_0 arbvp1
+	default_params
+	{
+		param_named_auto worldViewMatrix worldviewproj_matrix
+	}
+}
+
+
+material FogOfWar
+{
+	technique
+	{
+		pass
+		{	
+			cull_hardware none
+            cull_software none
+			vertex_program_ref fogOfWarVertexShader
+			{
+
+			}
+			fragment_program_ref fogOfWarFragmentShader
+			{
+
+			}
+		}
+	}
+}

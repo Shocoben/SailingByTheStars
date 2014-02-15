@@ -1,12 +1,11 @@
 #pragma once
 #include "Scene.h"
 #include "OgreTerrain.h"
-#include "RapidXML\rapidxml.hpp"
+
 
 class StarRepresentation;
 class Star;
 class Boat;
-using namespace rapidxml;
 
 class MainScene :public Scene
 {
@@ -24,16 +23,13 @@ protected :
 	Boat** _boats;
 	Ogre::Light* _sun;
 	Ogre::Terrain* _terrain;
-	xml_document<> _doc;
-	xml_node<>* _rootNode;
-	char* _xmlChar;
+
 
 
 	Ogre::Entity* _fogEnt;
-	Ogre::Plane* _fogPlane;
 	Ogre::SceneNode* _fogNode;
 public:
-	MainScene( MyApplication* app, const char* configFile);
+	MainScene( MyApplication* app, const xml_node<>* rootNode);
 	virtual ~MainScene(void);
 	virtual void createCameras( Ogre::RenderWindow* win );
 	virtual void createScene();
@@ -43,6 +39,9 @@ public:
 	virtual bool mousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id);
 	virtual bool mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id);
 	void createTerrain();
+	void createFogMesh();
+
+	void readPixelFromTexture(Ogre::TexturePtr texturePtr,Ogre::Vector3* output);
 	void addPortLight(const Ogre::Vector3& pos);
 };
 

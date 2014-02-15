@@ -1,6 +1,8 @@
 #pragma once
 #include "Ogre.h"
+#include "RapidXML\rapidxml.hpp"
 class ApplicationListener;
+using namespace rapidxml;
 
 class MyApplication
 {
@@ -16,10 +18,14 @@ class MyApplication
 
 
 		static bool _keepRunning;
+		xml_document<> _docXML;
+		xml_node<>* _rootXMLNode;
+		
 
+		char* _xmlChar;
 		
 	public :
-		MyApplication(const std::string& appName);
+		MyApplication(const std::string& appName, const std::string& xmlFile);
 		~MyApplication();
 
 		int startUp();
@@ -34,6 +40,7 @@ class MyApplication
 		static void exit();
 		void createColourCube();
 
+		const xml_node<>* getRootXMLNode();
 
 		ApplicationListener* getAppListener();
 

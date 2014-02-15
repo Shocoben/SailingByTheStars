@@ -4,12 +4,12 @@
 
 int main()
 {
-	MyApplication app("SailingByTheStars");
+	MyApplication app("SailingByTheStars", "media/terraint.xml");
 	int startR = app.go();
 
 	if (startR == 0)
 	{
-		MainScene* scene = new MainScene(&app, "media/terraint.xml");
+		MainScene* scene = new MainScene(&app, app.getRootXMLNode()->first_node("Levelone"));
 		app.getAppListener()->loadScene(scene);
 	
 		while( MyApplication::keepRunning() == true )

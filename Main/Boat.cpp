@@ -10,7 +10,7 @@ Boat::Boat(Scene* myScene, const Star* star, Ogre::Terrain* terrain) : GameObjec
 {
 	_node->setPosition(0.2,star->getWaterStar()->getNode()->_getDerivedPosition().y,-20);
 	_boatEnt = myScene->sceneManager()->createEntity("ColourCube");
-	_boatEnt->setMaterialName("Diffuse");
+	_boatEnt->setMaterialName("FogOfWar");
 	_node->attachObject(_boatEnt);
 	_node->setScale(0.4,0.4,0.4);
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "Ogre.h"
 #include "OIS.h"
-
+#include "RapidXML\rapidxml.hpp"
 
 class Scene;
 class GameObject;
@@ -9,11 +9,12 @@ class ApplicationListener;
 class MyApplication;
 
 using namespace Ogre;
+using namespace rapidxml;
 
 class Scene : public OIS::MouseListener, public OIS::KeyListener
 {
 public :
-	Scene(MyApplication* app);
+	Scene(MyApplication* app, const xml_node<>* rootNode);
 	~Scene();
 	virtual void createCameras(Ogre::RenderWindow* win) = 0;
 	virtual void createScene() = 0;
@@ -43,6 +44,6 @@ protected :
 	virtual bool mouseReleased (const OIS::MouseEvent &arg, OIS::MouseButtonID id);
 	virtual bool keyPressed (const OIS::KeyEvent &arg);
 	virtual bool keyReleased (const OIS::KeyEvent &arg);
-
+	const xml_node<>* _rootNode;
 };
 

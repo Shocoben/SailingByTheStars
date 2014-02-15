@@ -3,7 +3,7 @@
 #include "Scene.h"
 #include "GameObject.h"
 
-Scene::Scene( MyApplication* app ) : _application(app), _appListener(app->getAppListener()), _listenerID(_appListener->getLastSceneID())
+Scene::Scene( MyApplication* app, const xml_node<>* rootNode ) : _application(app), _appListener(app->getAppListener()), _listenerID(_appListener->getLastSceneID()), _rootNode(rootNode)
 {
 	_appListener->addScene(this);
 }
