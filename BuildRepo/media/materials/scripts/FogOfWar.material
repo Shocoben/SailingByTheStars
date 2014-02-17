@@ -21,10 +21,13 @@ material FogOfWar
 {
 	technique
 	{
+	
 		pass
 		{	
-			cull_hardware none
-            cull_software none
+			texture_unit
+			{
+				texture terr_rock6.jpg
+			}
 			vertex_program_ref fogOfWarVertexShader
 			{
 

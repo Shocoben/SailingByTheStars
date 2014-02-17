@@ -25,7 +25,9 @@ protected :
 	Ogre::Terrain* _terrain;
 
 
-
+	Ogre::TexturePtr _fogTexture;
+	Ogre::TextureUnitState* _fogTextureLink;
+	Ogre::MaterialPtr _fogMaterial;
 	Ogre::Entity* _fogEnt;
 	Ogre::SceneNode* _fogNode;
 public:
@@ -40,6 +42,7 @@ public:
 	virtual bool mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id);
 	void createTerrain();
 	void createFogMesh();
+	void createFog();
 
 	void readPixelFromTexture(Ogre::TexturePtr texturePtr,Ogre::Vector3* output);
 	void addPortLight(const Ogre::Vector3& pos);

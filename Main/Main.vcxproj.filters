@@ -103,6 +103,12 @@
     <None Include="..\BuildRepo\media\materials\scripts\Ocean.material">
       <Filter>Fichiers de ressources</Filter>
     </None>
+    <None Include="..\BuildRepo\media\materials\scripts\FogOfWar.material">
+      <Filter>Fichiers de ressources</Filter>
+    </None>
+    <None Include="..\BuildRepo\media\materials\programs\Cg\fogOfWar.cg">
+      <Filter>Fichiers de ressources</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\BuildRepo\media\terraint.xml">

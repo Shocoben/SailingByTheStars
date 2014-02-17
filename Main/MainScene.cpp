@@ -193,9 +193,7 @@ void MainScene::createFogMesh()
 			vertexI++;
 		}
 	}
-
-
-
+	
 	fogMesh->sharedVertexData = new Ogre::VertexData;
 	fogMesh->sharedVertexData->vertexCount = nbrVertices;
 
@@ -244,11 +242,7 @@ void MainScene::createFogMesh()
 
 	fogMesh->load();
 
-	_fogEnt = _sceneManager->createEntity("Fog", "FogPlane");
-	Ogre::SceneNode* _fogSceneNode = _sceneManager->getRootSceneNode()->createChildSceneNode("FogSceneNode");
-	
-	_fogEnt->setMaterialName("FogOfWar");
-	_fogSceneNode->attachObject(_fogEnt);
+
 	
 }
 
@@ -313,15 +307,57 @@ void MainScene::createScene()
 	_skySphere = new Sphere(Vector3(0,0,0), 60);
 	_skyPlane = new Ogre::Plane(Ogre::Vector3:: UNIT_Y, atof(waterPlaneNode->first_attribute("skyPlaneY")->value()) );
 	
-	/*
 	Ogre::MeshManager::getSingleton().createPlane("WaterMesh", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,*_waterPlane, atof(waterPlaneNode->first_attribute("waterMeshW")->value()), atof(waterPlaneNode->first_attribute("waterMeshH")->value()),150,150, true, 1, 7, 5, Ogre::Vector3::UNIT_Z);
 	Ogre::Entity* waterEnt = _sceneManager->createEntity("WaterEnt", "WaterMesh");
 	_sceneManager->getRootSceneNode()->createChildSceneNode()->attachObject(waterEnt);
 	waterEnt->setMaterialName("Ocean2_Cg");
-	*/
+	
 	//createFogMesh();
+	
 	createTerrain();
 	createBoatsAndStars();
+	createFog();
+	
+}
+
+void MainScene::createFog()
+{
+	_fogMaterial = Ogre::MaterialManager::getSingletonPtr()->getByName("FogOfWar");
+	_fogTextureLink = _fogMaterial->getTechnique(0)->getPass(0)->getTextureUnitState(0);
+
+	xml_node<>* planesNode = _rootNode->first_node("Planes");
+	_fogTexture = Ogre::TextureManager::getSingletonPtr()->createManual("fogTexture", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, Ogre::TEX_TYPE_2D,
+																		atoi(planesNode->first_attribute("fogPlaneSegX")->value()), atoi(planesNode->first_attribute("fogPlaneSegY")->value()), 0,
+																		PF_R8G8B8, TU_DYNAMIC );
+
+	_fogTexture->load();
+
+	
+	Ogre::Image::Box lockBox(0,0,50,50);
+	_fogTexture->getBuffer()->lock(lockBox,Ogre::HardwareBuffer::LockOptions::HBL_NORMAL);
+	const PixelBox& pixBox = _fogTexture->getBuffer()->getCurrentLock();
+	std::cout << pixBox.format << std::endl;
+
+	Ogre::uint8* pDest = static_cast<Ogre::uint8*>(pixBox.data);
+
+	 for(size_t i = 0, width = 50; i < width; ++i)
+    {
+        for(size_t j = 0, height = 1 ; j < height; ++j)
+        {
+            *pDest++ = 255;  //R
+            *pDest++ = 255;  //G
+            *pDest++ = 255;  //B
+        }
+    }
+	_fogTexture->getBuffer()->unlock();
+
+	_fogTextureLink->setTextureName("fogTexture");	
+	
+	_fogEnt = _sceneManager->createEntity("Fog", "FogPlane");
+	Ogre::SceneNode* _fogSceneNode = _sceneManager->getRootSceneNode()->createChildSceneNode("FogSceneNode");
+	
+	_fogEnt->setMaterial(_fogMaterial);
+	_fogSceneNode->attachObject(_fogEnt);
 }
 
 void MainScene::createBoatsAndStars()
