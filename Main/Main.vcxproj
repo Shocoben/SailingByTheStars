@@ -112,8 +112,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\BuildRepo\media\materials\programs\Cg\fogOfWar.cg" />
+    <None Include="..\BuildRepo\media\materials\programs\Cg\fogOfWarTwo.cg" />
     <None Include="..\BuildRepo\media\materials\scripts\diffuse.material" />
     <None Include="..\BuildRepo\media\materials\scripts\FogOfWar.material" />
+    <None Include="..\BuildRepo\media\materials\scripts\FogOfWar2.material" />
     <None Include="..\BuildRepo\media\materials\scripts\Ocean.material" />
     <None Include="..\BuildRepo\myResources_d.cfg" />
   </ItemGroup>

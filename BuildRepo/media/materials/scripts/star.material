@@ -1,0 +1,20 @@
+material SailingByTheStars/Star
+ {
+    technique
+    {
+      pass
+      {
+        lighting off
+        scene_blend alpha_blend
+        depth_write off
+        cull_software off
+        
+        diffuse vertexcolour
+
+        texture_unit
+        {
+          texture starthree.png
+        }
+      }
+    }
+ }

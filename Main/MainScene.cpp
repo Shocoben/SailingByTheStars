@@ -8,7 +8,8 @@
 #include "OgreTerrain.h"
 #include "TerrainGeneratorB.h"
 
-MainScene::MainScene(MyApplication* app, const xml_node<>* rootNode) : Scene( app, rootNode), _nbrStars(1), _stars(new Star*[_nbrStars]), _movementSpeed(50.0f), _movingStar(NULL), _boats(new Boat*[_nbrStars])
+MainScene::MainScene(MyApplication* app, const xml_node<>* rootNode) : Scene( app, rootNode), _nbrStars(std::atoi(_rootNode->first_node("Boats")->first_attribute("number")->value())),
+_stars(new Star*[_nbrStars]), _movementSpeed(50.0f), _movingStar(NULL), _boats(new Boat*[_nbrStars])
 {
 
 }
@@ -32,7 +33,9 @@ MainScene::~MainScene(void)
 void MainScene::createCameras(Ogre::RenderWindow* win)
 {
 	_mainCamera = _sceneManager->createCamera( "MainCamera" );
-	_mainCamera->setPosition( Ogre::Vector3( 0,29,0 ) );
+
+	xml_node<>* CameraNode = _rootNode->first_node("Camera");
+	_mainCamera->setPosition( Ogre::Vector3(atof(CameraNode->first_attribute("startX")->value()), atof(CameraNode->first_attribute("startY")->value()), atof(CameraNode->first_attribute("startZ")->value()) ) );
 	_mainCamera->lookAt( 0, 15, -15 );
 	_mainCamera->setNearClipDistance(5);	
 	_viewport= win->addViewport(_mainCamera);
@@ -122,6 +125,7 @@ void MainScene::createFogMesh()
 	int segX = atoi(terrainNode->first_attribute("fogPlaneSegX")->value()); 
 	int segY = atoi(terrainNode->first_attribute("fogPlaneSegY")->value());
 	double minY = atof(terrainNode->first_attribute("fogMinY")->value());
+	double diffY = atof(terrainNode->first_attribute("fogDiffY")->value());
 
 	//FogMesh
 	Ogre::MeshPtr fogMesh = Ogre::MeshManager::getSingleton().createManual("FogPlane", "General");
@@ -163,7 +167,7 @@ void MainScene::createFogMesh()
 			
 			//position
 			positions[vArrayIndex] = point->x;
-			positions[vArrayIndex + 1] = (point->y > minY)? point->y + minY: minY;
+			positions[vArrayIndex + 1] = (point->y > minY)? point->y + diffY: minY;
 			positions[vArrayIndex + 2] = point->z;
 
 			//normals
@@ -315,41 +319,59 @@ void MainScene::createScene()
 	//createFogMesh();
 	
 	createTerrain();
-	createBoatsAndStars();
 	createFog();
+	createBoatsAndStars();
 	
 }
 
 void MainScene::createFog()
 {
-	_fogMaterial = Ogre::MaterialManager::getSingletonPtr()->getByName("FogOfWar");
+	_fogMaterial = Ogre::MaterialManager::getSingletonPtr()->getByName("FogOfWarTwo");
 	_fogTextureLink = _fogMaterial->getTechnique(0)->getPass(0)->getTextureUnitState(0);
 
 	xml_node<>* planesNode = _rootNode->first_node("Planes");
 	_fogTexture = Ogre::TextureManager::getSingletonPtr()->createManual("fogTexture", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, Ogre::TEX_TYPE_2D,
 																		atoi(planesNode->first_attribute("fogPlaneSegX")->value()), atoi(planesNode->first_attribute("fogPlaneSegY")->value()), 0,
-																		PF_R8G8B8, TU_DYNAMIC );
+																		PF_X8R8G8B8, TU_DYNAMIC );
 
 	_fogTexture->load();
 
 	
-	Ogre::Image::Box lockBox(0,0,50,50);
-	_fogTexture->getBuffer()->lock(lockBox,Ogre::HardwareBuffer::LockOptions::HBL_NORMAL);
-	const PixelBox& pixBox = _fogTexture->getBuffer()->getCurrentLock();
-	std::cout << pixBox.format << std::endl;
 
-	Ogre::uint8* pDest = static_cast<Ogre::uint8*>(pixBox.data);
+	xml_node<>* textureNode = _rootNode->first_node("Textures");
+	/// Lock the buffer so we can write to it
+	_fogTexture->getBuffer()->lock(HardwareBuffer::HBL_NORMAL);
+	
+	const PixelBox &pb = _fogTexture->getBuffer()->getCurrentLock();
 
-	 for(size_t i = 0, width = 50; i < width; ++i)
-    {
-        for(size_t j = 0, height = 1 ; j < height; ++j)
-        {
-            *pDest++ = 255;  //R
-            *pDest++ = 255;  //G
-            *pDest++ = 255;  //B
-        }
-    }
+	/// Update the contents of pb here
+	/// Image data starts at pb.data and has format pb.format
+	/// Here we assume data.format is PF_X8R8G8B8 so we can address pixels as uint32.
+	uint32 *data = static_cast<uint32*>(pb.data);
+	size_t height = pb.getHeight();
+	size_t width = pb.getWidth();
+	size_t pitch = pb.rowPitch; // Skip between rows of image
+	for(size_t y=0; y<height; ++y)
+	{
+		for(size_t x=0; x<width; ++x)
+		{
+			// 0xRRGGBB -> fill the buffer with yellow pixels
+			data[pitch*y + x] = 0x00FF00;
+		}
+	}
+
+	for(size_t x=0; x<50; ++x)
+	{
+		for(size_t y=0; y<2; ++y)
+		{
+			// 0xRRGGBB -> fill the buffer with yellow pixels
+			data[pitch*y + x] = 0;
+		}
+	}
+
+	/// Unlock the buffer again (frees it for use by the GPU)
 	_fogTexture->getBuffer()->unlock();
+	
 
 	_fogTextureLink->setTextureName("fogTexture");	
 	
@@ -358,6 +380,16 @@ void MainScene::createFog()
 	
 	_fogEnt->setMaterial(_fogMaterial);
 	_fogSceneNode->attachObject(_fogEnt);
+	_fogParamPtr = _fogMaterial->getBestTechnique(0)->getPass(0)->getFragmentProgramParameters();
+
+	
+
+	/*
+	if(_fogParamPtr->hasNamedParameters())
+	{
+		std::cout << "hello" << std::endl;
+	}
+	_fogParamPtr->setNamedConstant("clarity", clarity, 1, 1);*/
 }
 
 void MainScene::createBoatsAndStars()
@@ -365,7 +397,10 @@ void MainScene::createBoatsAndStars()
 	for (int i = 0; i < _nbrStars; ++i)
 	{
 		_stars[i] = new Star(this, _skySphere, _waterPhysicPlane, _skyPlane);
-		_boats[i] = new Boat(this, _stars[i], _terrain);
+
+		Ogre::stringstream boatParamName;
+		boatParamName << "boat" << i;
+		_boats[i] = new Boat(this, _stars[i], _terrain, _fogParamPtr, boatParamName.str());
 	}
 }
 

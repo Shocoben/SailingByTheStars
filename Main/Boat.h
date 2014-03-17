@@ -9,7 +9,7 @@ class SphereCollider;
 class Boat : public GameObject
 {
 public:
-	Boat(Scene* myScene, const Star* star, Ogre::Terrain* terrain);
+	Boat(Scene* myScene, const Star* star, Ogre::Terrain* terrain, Ogre::GpuProgramParametersSharedPtr fogPtr, Ogre::String& paramFogName);
 	virtual void update(const Ogre::FrameEvent& evt);
 	static int count;
 	~Boat(void);
@@ -23,5 +23,9 @@ protected :
 	Ogre::Terrain* _terrain;
 	Ogre::SceneNode* _frontNode;
 	Ogre::SceneNode* _lightNode;
+	Ogre::GpuProgramParametersSharedPtr _fogPtr;
+
+	float* _posFloat4;
+	Ogre::String _paramFogName;
 };
 

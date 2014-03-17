@@ -30,6 +30,7 @@ protected :
 	Ogre::MaterialPtr _fogMaterial;
 	Ogre::Entity* _fogEnt;
 	Ogre::SceneNode* _fogNode;
+	Ogre::GpuProgramParametersSharedPtr _fogParamPtr;
 public:
 	MainScene( MyApplication* app, const xml_node<>* rootNode);
 	virtual ~MainScene(void);

@@ -6,11 +6,14 @@
 #include "Collider.h"
 
 int Boat::count = 0;
-Boat::Boat(Scene* myScene, const Star* star, Ogre::Terrain* terrain) : GameObject(myScene), _repr( star->getWaterStar() ), _reactivity(1.5), _speed(3), _starPoint(new PointCollider(star->getWaterStar()->getNode()->_getDerivedPosition())), _starCollider(NULL), _terrain(terrain)
+Boat::Boat(Scene* myScene, const Star* star, Ogre::Terrain* terrain, Ogre::GpuProgramParametersSharedPtr fogParamPtr, Ogre::String& paramFogName) : 
+GameObject(myScene), _repr( star->getWaterStar() ),_reactivity(1.5), _speed(3),
+_starPoint(new PointCollider(star->getWaterStar()->getNode()->_getDerivedPosition())),
+_starCollider(NULL), _terrain(terrain), _fogPtr(fogParamPtr), _posFloat4(new float[4]), _paramFogName(paramFogName)
 {
 	_node->setPosition(0.2,star->getWaterStar()->getNode()->_getDerivedPosition().y,-20);
 	_boatEnt = myScene->sceneManager()->createEntity("ColourCube");
-	_boatEnt->setMaterialName("FogOfWar");
+	_boatEnt->setMaterialName("Diffuse");
 	_node->attachObject(_boatEnt);
 	_node->setScale(0.4,0.4,0.4);
 
@@ -41,11 +44,15 @@ Boat::Boat(Scene* myScene, const Star* star, Ogre::Terrain* terrain) : GameObjec
 
 	_starCollider = new SphereCollider(Vector3(0,0,0), _node, 0.6);
 
+	_posFloat4[1] = 0;
+	_posFloat4[3] = 1;
 	count++;
 }
 
 void Boat::update(const Ogre::FrameEvent& evt)
 {
+	
+
 	if (_myScene->getAppListener()->keyboard()->isKeyDown(OIS::KC_DOWN))
 	{
 		_reactivity-= 0.005f;
@@ -86,6 +93,13 @@ void Boat::update(const Ogre::FrameEvent& evt)
 		}
 		
 	}
+	Vector3 derivedPos = _node->getPosition();
+
+
+	_posFloat4[0] = static_cast<float>(derivedPos.x);
+	_posFloat4[2] = static_cast<float>(derivedPos.z);
+
+	//_fogPtr->setNamedConstant(_paramFogName, _posFloat4, 4, 1);
 }
 	
 

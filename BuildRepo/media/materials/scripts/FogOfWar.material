@@ -2,17 +2,29 @@ fragment_program fogOfWarFragmentShader cg
 {
 	source fogOfWar.cg
 	entry_point MyFragmentShader
-	profiles ps_2_0 arbfp1	
+	profiles ps_3_0 arbfp1	
+	default_params
+	{
+		param_named boat0 float4 0 0 0 1
+		param_named boat1 float4 25 0 25 0
+		param_named boat2 float4 25 0 50 0
+		param_named boat3 float4 25 0 25 0
+		param_named boat4 float4 25 0 25 0
+
+		param_named clarity float 8
+		param_named distance float 25
+	}
 }
 
 vertex_program fogOfWarVertexShader cg
 {
 	source fogOfWar.cg
 	entry_point MyVertexShader
-	profiles vs_2_0 arbvp1
+	profiles vs_3_0 arbvp1
 	default_params
 	{
 		param_named_auto worldViewMatrix worldviewproj_matrix
+		param_named_auto modelWorld world_matrix
 	}
 }
 
@@ -24,6 +36,10 @@ material FogOfWar
 	
 		pass
 		{	
+			lighting off
+			scene_blend alpha_blend 
+			depth_write off
+
 			texture_unit
 			{
 				texture terr_rock6.jpg

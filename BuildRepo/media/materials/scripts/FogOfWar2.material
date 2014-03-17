@@ -1,0 +1,49 @@
+fragment_program fogOfWarFragmentShaderTwo cg
+{
+	source fogOfWarTwo.cg
+	entry_point MyFragmentShader
+	profiles ps_3_0 arbfp1	
+	default_params
+	{
+
+	}
+}
+
+vertex_program fogOfWarVertexShaderTwo cg
+{
+	source fogOfWarTwo.cg
+	entry_point MyVertexShader
+	profiles vs_3_0 arbvp1
+	default_params
+	{
+		param_named_auto worldViewMatrix worldviewproj_matrix
+	}
+}
+
+
+material FogOfWarTwo
+{
+	technique
+	{
+	
+		pass
+		{	
+			lighting off
+			scene_blend alpha_blend 
+			depth_write off
+
+			texture_unit
+			{
+				texture terr_rock6.jpg
+			}
+			vertex_program_ref fogOfWarVertexShaderTwo
+			{
+
+			}
+			fragment_program_ref fogOfWarFragmentShaderTwo
+			{
+
+			}
+		}
+	}
+}

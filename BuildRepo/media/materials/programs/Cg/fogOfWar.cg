@@ -1,11 +1,51 @@
-void MyVertexShader(float4 position : POSITION, out float4 oPosition : POSITION, float2 uv: TEXCOORD0, out float2 oUV:TEXCOORD0, uniform float4x4 worldViewMatrix)
+void MyVertexShader(float4 position : POSITION, out float4 oPosition : POSITION, float2 uv: TEXCOORD0, out float2 oUV:TEXCOORD0, out float4 oWorldPos : TEXCOORD4, uniform float4x4 worldViewMatrix, uniform float4x4 modelWorld )
 {
+	oWorldPos = mul( modelWorld, position );
 	oPosition = mul(worldViewMatrix, position);
 	oUV = uv;
 }
 
-void MyFragmentShader(float2 uv : TEXCOORD0, out float4 color : COLOR, uniform sampler2D texture)
+float fragD(float3 elemPos, float3 worldPos)
 {
-	color = tex2D(texture, uv);
+	return ((elemPos.x - worldPos.x) * (elemPos.x - worldPos.x)) + ((elemPos.z - worldPos.z) * (elemPos.z - worldPos.z));
+}
+
+float dImportance(float distance, float distanceShow)
+{
+	return min( (distance  / distanceShow) , 1);
+}
+
+void MyFragmentShader(  float2 uv : TEXCOORD0, out float4 color : COLOR, float4 worldPos : TEXCOORD4, uniform sampler2D texture, uniform float distance, uniform float4 boat0, uniform float4 boat1, uniform float4 boat2, uniform float4 boat3, uniform float4 boat4, uniform float clarity)
+{
+	
+	float4 boatsInfos[5];
+
+	boatsInfos[0] = boat0;
+	boatsInfos[1] = boat1;
+	boatsInfos[2] = boat2;
+	boatsInfos[3] = boat3;
+	boatsInfos[4] = boat4;
+
+	float distances[5];
+	float distanceShow = distance * distance;
+	float d = 0;
+	float nbrBoat = 0;
+
+	int i = 0;
+	for ( i = 0; i < 5; ++i)
+	{
+		distances[i] = fragD(boatsInfos[i].xyz, worldPos.xyz);
+	}
+
+	
+	for ( i = 0; i < 5; i++)
+	{
+		d = d + ( dImportance( distances[i], distanceShow) *  boatsInfos[i].w );
+		nbrBoat = nbrBoat + boatsInfos[i].w;
+	}
+
+	d = max( min( pow( d / max(nbrBoat, 1), clarity ), 1 ), 0 );
+
+	color = float4(0, 0, 0, d);
 }
 

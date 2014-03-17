@@ -42,9 +42,17 @@ void StarRepresentation::setTwin(StarRepresentation* twin)
 
 StarRepresentation::StarRepresentation(Scene* myScene, StarRepresentation* twin, Ogre::Sphere* skySphere, Ogre::Plane* waterPlane, Ogre::Plane* skyPlane) : GameObject(myScene), _twin(twin), _skySphere(skySphere), _waterPlane(waterPlane), _skyPlane(skyPlane)
 {
-	Ogre::Entity* ent = _myScene->sceneManager()->createEntity("Sinbad.mesh");
-	_node->attachObject(ent);
-	_node->setScale(0.2,0.2,0.2);
+	//Ogre::Entity* ent = _myScene->sceneManager()->createEntity("Sinbad.mesh");
+
+	Ogre::BillboardSet* bSet = _myScene->sceneManager()->createBillboardSet(1);
+	bSet->setMaterialName("SailingByTheStars/Star");
+	Billboard* b = bSet->createBillboard(0,0,0, Ogre::ColourValue(0.4,0.8,0.9, 0.7));
+	
+	bSet->setBounds(Ogre::AxisAlignedBox(Ogre::AxisAlignedBox::EXTENT_INFINITE), 1000);
+
+
+	_node->attachObject(bSet);
+	_node->setScale(0.08,0.08,0.08);
 	if (twin != NULL)
 	{
 		twin->setTwin(this);
@@ -58,7 +66,6 @@ WaterStar::WaterStar(Scene* myScene, StarRepresentation* twin, Ogre::Sphere* sky
 
 void WaterStar::followMouseRay(const Ogre::Ray& mouseRay)
 {
-	
 	std::pair<bool, Real> intersectR = Math::intersects(mouseRay, *_waterPlane);
 	if (intersectR.first)
 	{
@@ -71,7 +78,7 @@ void WaterStar::followMouseRay(const Ogre::Ray& mouseRay)
 			pos.z = 50;
 		if (pos.z < -50)
 			pos.z = - 50;*/
-
+		
 		std::cout<< " x " << pos.x << " y " << pos.y << " z " << pos.z << std::endl;
 		_node->setPosition(pos);
 	}

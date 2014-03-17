@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ApplicationDescription>
   <Levelone test="hello">
+    <Camera startX="-101" startY="29" startZ="128"></Camera>
     <Terrain heightMap="terrain1.png" terrainSize="129" worldSize="257" inputScale="33" minBatchSize="17" maxBatchSize="33">
       <Layer worldSize="33" texture="rock.jpg" normal="rock_Normal.jpg"></Layer>
     </Terrain>
-    <Planes skyPlaneY="60" waterPhysicPlaneY="10" waterPlaneY="9" fogPlaneY="25" waterMeshW="800" waterMeshH="800" fogPlaneSegX="200" fogPlaneSegY="200" fogMinY="12">
+    <Planes skyPlaneY="60" waterPhysicPlaneY="15" waterPlaneY="9" fogPlaneY="25" waterMeshW="800" waterMeshH="800" fogPlaneSegX="200" fogPlaneSegY="200" fogMinY="12" fogDiffY ="2.5">
     </Planes>
+    <Textures segX="50" segY="2" lockX="50" lockY="50"></Textures>
+    <Boats number="2"></Boats>
   </Levelone>
 </ApplicationDescription>
