@@ -6,6 +6,7 @@
 class StarRepresentation;
 class Star;
 class Boat;
+class OgreTextureHandler;
 
 class MainScene :public Scene
 {
@@ -26,6 +27,9 @@ protected :
 
 
 	Ogre::TexturePtr _fogTexture;
+	OgreTextureHandler* _fogTextureHandler;
+
+
 	Ogre::TextureUnitState* _fogTextureLink;
 	Ogre::MaterialPtr _fogMaterial;
 	Ogre::Entity* _fogEnt;

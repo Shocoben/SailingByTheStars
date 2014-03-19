@@ -7,9 +7,10 @@
 #include "Collider.h"
 #include "OgreTerrain.h"
 #include "TerrainGeneratorB.h"
+#include "OgreTextureHandler.h"
 
 MainScene::MainScene(MyApplication* app, const xml_node<>* rootNode) : Scene( app, rootNode), _nbrStars(std::atoi(_rootNode->first_node("Boats")->first_attribute("number")->value())),
-_stars(new Star*[_nbrStars]), _movementSpeed(50.0f), _movingStar(NULL), _boats(new Boat*[_nbrStars])
+	_stars(new Star*[_nbrStars]), _movementSpeed(50.0f), _movingStar(NULL), _boats(new Boat*[_nbrStars]), _fogTextureHandler(NULL)
 {
 
 }
@@ -27,6 +28,7 @@ MainScene::~MainScene(void)
 	_terrain->freeTemporaryResources();
 	delete [] _stars;
 	delete [] _boats;
+	delete _fogTextureHandler;
 	Scene::~Scene();
 }
 
@@ -336,42 +338,11 @@ void MainScene::createFog()
 
 	_fogTexture->load();
 
-	
-
 	xml_node<>* textureNode = _rootNode->first_node("Textures");
-	/// Lock the buffer so we can write to it
-	_fogTexture->getBuffer()->lock(HardwareBuffer::HBL_NORMAL);
 	
-	const PixelBox &pb = _fogTexture->getBuffer()->getCurrentLock();
-
-	/// Update the contents of pb here
-	/// Image data starts at pb.data and has format pb.format
-	/// Here we assume data.format is PF_X8R8G8B8 so we can address pixels as uint32.
-	uint32 *data = static_cast<uint32*>(pb.data);
-	size_t height = pb.getHeight();
-	size_t width = pb.getWidth();
-	size_t pitch = pb.rowPitch; // Skip between rows of image
-	for(size_t y=0; y<height; ++y)
-	{
-		for(size_t x=0; x<width; ++x)
-		{
-			// 0xRRGGBB -> fill the buffer with yellow pixels
-			data[pitch*y + x] = 0x00FF00;
-		}
-	}
-
-	for(size_t x=0; x<50; ++x)
-	{
-		for(size_t y=0; y<2; ++y)
-		{
-			// 0xRRGGBB -> fill the buffer with yellow pixels
-			data[pitch*y + x] = 0;
-		}
-	}
-
-	/// Unlock the buffer again (frees it for use by the GPU)
-	_fogTexture->getBuffer()->unlock();
-	
+	_fogTextureHandler = new OgreTextureHandler(_fogTexture, 0x000000);
+	_fogTextureHandler->drawRect(0,0,50,20,0xFF0000);
+	_fogTextureHandler->updateTexture();
 
 	_fogTextureLink->setTextureName("fogTexture");	
 	
